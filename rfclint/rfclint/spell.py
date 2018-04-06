@@ -403,18 +403,22 @@ class Speller(object):
                           where=r[2])
             else:
                 log.error(u"Misspelled word was found '{0}'".format(r[3]), where=r[2])
-            if self.window > 0:
-                q = self.wordIndex(r[1], r[2], matchGroups)
-                if q >= 0:
-                    ctx = ""
-                    if q > 0:
-                        ctx = "".join(allWords[max(0, q-self.window):q])
-                    ctx += self.color_start + allWords[q] + self.color_end
-                    if q < len(allWords):
-                        ctx += "".join(allWords[q+1:min(q+self.window+1, len(allWords))])
-                    log.error(ctx, additional=2)
-            if self.suggest and r[4]:
-                log.error(r[4], additional=2)
+
+            if self.interactive:
+                self.Interact(r, matchGroups)
+            else:
+                if self.window > 0:
+                    q = self.wordIndex(r[1], r[2], matchGroups)
+                    if q >= 0:
+                        ctx = ""
+                        if q > 0:
+                            ctx = "".join(allWords[max(0, q-self.window):q])
+                        ctx += self.color_start + allWords[q] + self.color_end
+                        if q < len(allWords):
+                            ctx += "".join(allWords[q+1:min(q+self.window+1, len(allWords))])
+                        log.error(ctx, additional=2)
+                if self.suggest and r[4]:
+                    log.error(r[4], additional=2)
 
         # check for dups
         last = None
@@ -437,3 +441,8 @@ class Speller(object):
                (m[0].start(1) <= offset and offset <= m[0].end(1)):
                 return i
         return -1
+
+    def Interact(self, result, matchGroups):
+        log.error("", additional=0)
+        q = self.wordIndex(r[1], r[2], matchGroups)
+        ctx 
