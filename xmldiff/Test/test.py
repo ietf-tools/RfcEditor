@@ -3,6 +3,9 @@ import unittest
 import os
 import shutil
 import difflib
+import sys
+import subprocess
+import six
 from rfctools_common.parser import XmlRfcParser
 from rfctools_common.parser import XmlRfcError
 from xmldiff.EditItem import EditItem
@@ -10,10 +13,61 @@ from xmldiff.zzs2 import distance
 from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, diffCount
 from xmldiff.DiffNode import ChangeTagMatching, tagMatching, AddParagraphs
 
+xmldiff_program = "../xmldiff/run.py"
+
 
 class OOO(object):
     def __init__(self):
         self.debug = True
+
+
+class TestCommandLineOptions(unittest.TestCase):
+    """ Run a set of command line checks to make sure they work """
+    def test_get_version(self):
+        check_process(self, [sys.executable, xmldiff_program, "--version"],
+                      "Results/Version.out", "Results/Empty.txt",
+                      None, None)
+
+    def test_clear_cache(self):
+        if not os.path.exists('Temp'):
+            os.mkdir('Temp')
+        if not os.path.exists('Temp/cache'):
+            os.mkdir('Temp/cache')
+        shutil.copy('Tests/cache_saved/reference.RFC.1847.xml',
+                    'Temp/cache/reference.RFC.1847.xml')
+        check_process(self, [sys.executable, xmldiff_program, "--clear-cache",
+                             "--cache=Temp/cache"],
+                      None, None,
+                      None, None)
+        self.assertFalse(os.path.exists('Temp/cache/reference.RFC.1847.xml'))
+
+    def test_help(self):
+        check_process(self, [sys.executable, xmldiff_program, "--help"],
+                      "Results/Empty.txt", "Results/Empty.txt", None, None)
+
+    def test_single(self):
+        if not os.path.exists('Temp'):
+            os.mkdir('Temp')
+        check_process(self, [sys.executable, xmldiff_program, "--verbose",
+                             "-o", "Temp/Single.html", "Tests/Simple.xml", "Tests/SimpleTree.xml"],
+                      "Results/Empty.txt", "Results/Empty.txt",
+                      "Temp/Single.html", "Results/Empty.txt")
+
+    def test_single(self):
+        if not os.path.exists('Temp'):
+            os.mkdir('Temp')
+        check_process(self, [sys.executable, xmldiff_program, "-t", "single.html",
+                             "-o", "Temp/Single.html", "Tests/Simple.xml", "Tests/SimpleTree.xml"],
+                      "Results/Empty.txt", "Results/Empty.txt",
+                      "Temp/Single.html", "Results/Empty.txt")
+
+    def test_base(self):
+        if not os.path.exists('Temp'):
+            os.mkdir('Temp')
+        check_process(self, [sys.executable, xmldiff_program, "-t", "base.html",
+                             "-o", "Temp/Base.html", "Tests/Simple.xml", "Tests/SimpleTree.xml"],
+                      "Results/Empty.txt", "Results/Empty.txt",
+                      "Temp/Base.html", "Results/Empty.txt")
 
 
 class TestParserMethods(unittest.TestCase):
@@ -209,6 +263,96 @@ def DistanceTest(tester, leftFile, rightFile, diffFile, htmlFile, markParagraphs
     if hasError:
         print("\n".join(result))
         tester.assertFalse(hasError, "html differs")
+
+
+def check_process(tester, args, stdoutFile, errFile, generatedFile, compareFile):
+    """
+    Execute a subprocess using args as the command line.
+    if stdoutFile is not None, compare it to the stdout of the process
+    if generatedFile and compareFile are not None, compare them to each other
+    """
+
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (stdoutX, stderr) = p.communicate()
+    p.wait()
+
+    returnValue = True
+    if stdoutFile is not None:
+        with open(stdoutFile, 'r') as f:
+            lines2 = f.readlines()
+
+        if six.PY2:
+            lines1 = stdoutX.splitlines(True)
+        else:
+            lines1 = stdoutX.decode('utf-8').splitlines(True)
+
+        if os.name == 'nt':
+            lines2 = [line.replace('Tests/', 'Tests\\').replace('Temp/', 'Temp\\')
+                      for line in lines2]
+            lines1 = [line.replace('\r', '') for line in lines1]
+
+        d = difflib.Differ()
+        result = list(d.compare(lines1, lines2))
+
+        hasError = False
+        for l in result:
+            if l[0:2] == '+ ' or l[0:2] == '- ':
+                hasError = True
+                break
+        if hasError:
+            print("stdout:")
+            print("".join(result))
+            returnValue = False
+
+    if errFile is not None:
+        with open(errFile, 'r') as f:
+            lines2 = f.readlines()
+
+        if six.PY2:
+            lines1 = stderr.splitlines(True)
+        else:
+            lines1 = stderr.decode('utf-8').splitlines(True)
+
+        if os.name == 'nt':
+            lines2 = [line.replace('Tests/', 'Tests\\').replace('Temp/', 'Temp\\')
+                      for line in lines2]
+            lines1 = [line.replace('\r', '') for line in lines1]
+
+        d = difflib.Differ()
+        result = list(d.compare(lines1, lines2))
+
+        hasError = False
+        for l in result:
+            if l[0:2] == '+ ' or l[0:2] == '- ':
+                hasError = True
+                break
+        if hasError:
+            print("stderr")
+            print("".join(result))
+            returnValue = False
+
+    if generatedFile is not None:
+        with open(generatedFile, 'r') as f:
+            lines2 = f.readlines()
+
+        with open(compareFile, 'r') as f:
+            lines1 = f.readlines()
+
+        d = difflib.Differ()
+        result = list(d.compare(lines1, lines2))
+
+        hasError = False
+        for l in result:
+            if l[0:2] == '+ ' or l[0:2] == '- ':
+                hasError = True
+                break
+
+        if hasError:
+            print(generatedFile)
+            print("".join(result))
+            returnValue = False
+
+    tester.assertTrue(returnValue, "Comparisons failed")
 
 
 def clear_cache(parser):

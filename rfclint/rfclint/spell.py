@@ -17,6 +17,25 @@ if six.PY2:
 else:
     import subprocess
 
+if os.name == 'nt':
+    import msvcrt
+    def get_character():
+        return msvcrt.getch()
+else:
+    import tty, sys, termios
+    def get_character():
+        fd = sys.stdin.fileno()
+        oldSettings = termios.tcgetattr(fd)
+
+        try:
+            tty.setcbreak(fd)
+            answer = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, oldSettings)
+            answer = None
+
+        return answer
+
 
 class RfcLintError(Exception):
     """ RFC Lint internal errors """
@@ -93,6 +112,8 @@ SpellerColors = {
 }
 # BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE,
 
+byte1 = b'\x31'
+byte9 = b'\x39'
 
 def which(program):
     def is_exe(fpath):
@@ -269,6 +290,10 @@ class Speller(object):
         # self.word_re = re.compile(r'\w+', re.UNICODE | re.MULTILINE)
         self.aspell_re = re.compile(r".\s(\S+)\s(\d+)\s*((\d+): (.+))?", re.UNICODE)
 
+        if config.options.output_filename is not None:
+            self.interactive = True
+            self.ignoreWords = []
+
     def processLine(self, allWords):
         """
         Process each individual set of words and return the errors found
@@ -405,7 +430,7 @@ class Speller(object):
                 log.error(u"Misspelled word was found '{0}'".format(r[3]), where=r[2])
 
             if self.interactive:
-                self.Interact(r, matchGroups)
+                self.Interact(r, matchGroups, allWords)
             else:
                 if self.window > 0:
                     q = self.wordIndex(r[1], r[2], matchGroups)
@@ -442,7 +467,74 @@ class Speller(object):
                 return i
         return -1
 
-    def Interact(self, result, matchGroups):
-        log.error("", additional=0)
+    def Interact(self, r, matchGroups, allWords):
+        #
+        #  At the request of the RFC editors we use the ispell keyboard mappings
+        #
+        #  R - replace the misspelled word completely
+        #  Space - Accept the word this time only.
+        #  A - Accept word for this session.
+        #  I - Accept the word, insert private dictionary as is
+        #  U - Accept the word, insert private dictionary as lower-case
+        #  0-n - Replace w/ one of the suggested words
+        #  L - Look up words in the system dictionary - NOT IMPLEMENTED
+        #  X - skip to end of the file
+        #  Q - quit and don't save the file
+        #  ? - Print help
+        #
+
         q = self.wordIndex(r[1], r[2], matchGroups)
-        ctx 
+
+        if allWords[q] in self.ignoreWords or allWords[q].lower() in self.ignoreWords:
+            return
+        
+        ctx = ""
+        if q > 0:
+            ctx = "".join(allWords[0:q])
+        ctx += self.color_start + allWords[q] + self.color_end
+        ctx += "".join(allWords[q+1:])
+        log.error("", additional=0)
+        log.error(ctx, additional=2)
+
+        log.error("", additional=0)
+        suggest = r[4].split(' ')
+
+        list = ""
+        for i in range(min(10, len(suggest))):
+            list += "{0}) {1} ".format(chr(i + 0x31), suggest[i]);
+
+        log.error(list, additional=2)
+        log.write("> ")
+        replaceWord = None
+
+        while (True):
+            ch = get_character()
+            if ch == ' ':
+                return
+            if ch == '?':
+                self.PrintHelp()
+            elif ch == 'Q':
+                sys.exit(1)
+            elif ch == 'I':
+                self.IgnoreWord(allWords[q])
+                return
+            elif ch == 'U':
+                self.IgnoreWord(allWords[q].tolower());
+                return
+            elif ch == 'X':
+                return
+            elif ch == 'R':
+                return
+            elif byte1 <= ch and ch <= byte9:
+                ch = int(ch) - int(byte1)
+                replaceWord = suggest[ch]
+            elif ch == '0':
+                replaceWord = suggest[9]
+            else:
+                pass
+
+            if replaceWord is not None:
+                return
+            log.write("\n> ")
+        
+        

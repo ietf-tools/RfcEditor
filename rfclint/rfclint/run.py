@@ -15,6 +15,7 @@ from rfctools_common import log
 from rfclint.config import ConfigFile
 from rfclint.abnf import AbnfChecker, RfcLintError
 from rfclint.spell import Speller, SpellerColors
+import rfclint
 
 try:
     from configparser import SafeConfigParser
