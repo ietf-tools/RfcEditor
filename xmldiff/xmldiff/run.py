@@ -13,7 +13,7 @@ import string
 from xmldiff.EditItem import EditItem
 from xmldiff.zzs2 import distance
 # from xmldiff.zzs import distance, EditItem
-import xmldiff
+from xmldiff.__init__ import __version__
 
 try:
     import debug
@@ -28,7 +28,7 @@ except ImportError:
 
 
 def display_version(self, opt, value, parser):
-    print(xmldiff.__version__)
+    print(__version__)
     sys.exit()
 
 
