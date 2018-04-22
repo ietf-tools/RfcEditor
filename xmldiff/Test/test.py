@@ -15,6 +15,21 @@ from xmldiff.DiffNode import ChangeTagMatching, tagMatching, AddParagraphs
 
 xmldiff_program = "rfc-xmldiff"
 
+def which(program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+    return None
+
 
 class OOO(object):
     def __init__(self):
@@ -272,7 +287,7 @@ def check_process(tester, args, stdoutFile, errFile, generatedFile, compareFile)
     if generatedFile and compareFile are not None, compare them to each other
     """
 
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (stdoutX, stderr) = p.communicate()
     p.wait()
 
@@ -362,4 +377,8 @@ def clear_cache(parser):
 if __name__ == '__main__':
     if os.environ.get('RFCEDITOR_TEST'):
         xmldiff_program = "../xmldiff/run.py"
+    else:
+        xmldiff_program = which(xmldiff_program)
+        if xmldiff_program is None:
+            print("Failed to find the rfc-xmldiff for testing")
     unittest.main(buffer=True)
