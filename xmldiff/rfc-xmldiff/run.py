@@ -8,12 +8,12 @@ import six
 import sys
 from rfctools_common.parser import XmlRfc, XmlRfcParser, XmlRfcError, CACHES
 from rfctools_common import log
-from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, AddParagraphs, tagMatching
+from rfc-xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, AddParagraphs, tagMatching
 import string
-from xmldiff.EditItem import EditItem
-from xmldiff.zzs2 import distance
+from rfc-xmldiff.EditItem import EditItem
+from rfc-xmldiff.zzs2 import distance
 # from xmldiff.zzs import distance, EditItem
-from xmldiff.__init__ import __version__
+from rfc-xmldiff.__init__ import __version__
 
 try:
     import debug
