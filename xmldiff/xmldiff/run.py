@@ -78,7 +78,7 @@ def main():
     value_options.add_option('-V', '--version', action='callback', callback=display_version,
                              help='display the version number and exit')
     value_options.add_option('-C', '--clear-cache', action='store_true', dest='clear_cache',
-                              default=False, help='purge the cache and exit')
+                             default=False, help='purge the cache and exit')
     value_options.add_option('-c', '--cache', dest='cache',
                              help='specify a primary cache directory to write to; '
                              'default: try [ %s ]' % ', '.join(CACHES))
@@ -178,7 +178,7 @@ def main():
     log.note("   template directory = " + templates_dir)
 
     if options.resource_url is None:
-        options.resource_url = os.path.join(templates_dir, 'Templates')
+        options.resource_url = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'Templates')
         if os.name == 'nt':
             options.resource_url = 'file:///' + options.resource_url.replace('\\', '/')
         else:

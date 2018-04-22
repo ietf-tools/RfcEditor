@@ -60,7 +60,7 @@ def write(*args):
     """ Prints a message to write_out """
     # write_err.write(u' '.join(args))
     write_to(write_err, u' '.join(args))
-    write_err.write('\n')
+    write_to(write_err, '\n')
 
 
 def note(*args):

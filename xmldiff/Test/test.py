@@ -13,7 +13,7 @@ from xmldiff.zzs2 import distance
 from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, diffCount
 from xmldiff.DiffNode import ChangeTagMatching, tagMatching, AddParagraphs
 
-xmldiff_program = "../xmldiff/run.py"
+xmldiff_program = "rfc-xmldiff"
 
 
 class OOO(object):
@@ -43,31 +43,31 @@ class TestCommandLineOptions(unittest.TestCase):
 
     def test_help(self):
         check_process(self, [sys.executable, xmldiff_program, "--help"],
-                      "Results/Empty.txt", "Results/Empty.txt", None, None)
+                      "Results/Help.out", "Results/Empty.txt", None, None)
+
+    def test_single_default(self):
+        if not os.path.exists('Temp'):
+            os.mkdir('Temp')
+        check_process(self, [sys.executable, xmldiff_program, "--quiet",
+                             "-o", "Temp/Single.html", "Tests/Simple.xml", "Tests/SimpleTree.xml"],
+                      "Results/Empty.txt", "Results/Empty.txt",
+                      "Temp/Single.html", "Results/Single.html")
 
     def test_single(self):
         if not os.path.exists('Temp'):
             os.mkdir('Temp')
-        check_process(self, [sys.executable, xmldiff_program, "--verbose",
+        check_process(self, [sys.executable, xmldiff_program, "-t", "single.html", "--quiet",
                              "-o", "Temp/Single.html", "Tests/Simple.xml", "Tests/SimpleTree.xml"],
                       "Results/Empty.txt", "Results/Empty.txt",
-                      "Temp/Single.html", "Results/Empty.txt")
-
-    def test_single(self):
-        if not os.path.exists('Temp'):
-            os.mkdir('Temp')
-        check_process(self, [sys.executable, xmldiff_program, "-t", "single.html",
-                             "-o", "Temp/Single.html", "Tests/Simple.xml", "Tests/SimpleTree.xml"],
-                      "Results/Empty.txt", "Results/Empty.txt",
-                      "Temp/Single.html", "Results/Empty.txt")
+                      "Temp/Single.html", "Results/Single.html")
 
     def test_base(self):
         if not os.path.exists('Temp'):
             os.mkdir('Temp')
-        check_process(self, [sys.executable, xmldiff_program, "-t", "base.html",
+        check_process(self, [sys.executable, xmldiff_program, "-t", "base.html", "--quiet",
                              "-o", "Temp/Base.html", "Tests/Simple.xml", "Tests/SimpleTree.xml"],
                       "Results/Empty.txt", "Results/Empty.txt",
-                      "Temp/Base.html", "Results/Empty.txt")
+                      "Temp/Base.html", "Results/Base.html")
 
 
 class TestParserMethods(unittest.TestCase):
@@ -360,4 +360,6 @@ def clear_cache(parser):
 
 
 if __name__ == '__main__':
+    if os.environ.get('RFCEDITOR_TEST'):
+        xmldiff_program = "../xmldiff/run.py"        
     unittest.main(buffer=True)
