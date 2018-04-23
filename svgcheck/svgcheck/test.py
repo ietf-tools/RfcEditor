@@ -13,11 +13,29 @@ import difflib
 from svgcheck.checksvg import checkTree
 import io
 
+test_program = "svgcheck"
+
+
+def which(program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+    return None
+
 
 class TestCommandLineOptions(unittest.TestCase):
     """ Run a set of command line checks to make sure they work """
     def test_get_version(self):
-        check_process(self, [sys.executable, "run.py", "--version"],
+        check_process(self, [sys.executable, test_program, "--version"],
                       "Results/version.out", "Results/version.err",
                       None, None)
 
@@ -28,7 +46,7 @@ class TestCommandLineOptions(unittest.TestCase):
             os.mkdir('Temp/cache')
         shutil.copy('Tests/cache_saved/reference.RFC.1847.xml',
                     'Temp/cache/reference.RFC.1847.xml')
-        check_process(self, [sys.executable, "run.py", "--clear-cache",
+        check_process(self, [sys.executable, test_program, "--clear-cache",
                              "--cache=Temp/cache"],
                       None, None,
                       None, None)
@@ -40,7 +58,7 @@ class TestParserMethods(unittest.TestCase):
     def test_pycodestyle_conformance(self):
         """Test that we conform to PEP8."""
         pep8style = pycodestyle.StyleGuide(quiet=False, config_file="pycode.cfg")
-        result = pep8style.check_files(['run.py', 'checksvg.py', 'word_properties.py',
+        result = pep8style.check_files([test_program, 'checksvg.py', 'word_properties.py',
                                         'test.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
@@ -89,34 +107,34 @@ class TestParserMethods(unittest.TestCase):
     def test_simple_sub(self):
         if not os.path.exists('Temp'):
             os.mkdir('Temp')
-        check_process(self, [sys.executable, "run.py", "--out=Temp/rfc.xml",
+        check_process(self, [sys.executable, test_program, "--out=Temp/rfc.xml",
                              "--repair", "--no-xinclude", "Tests/rfc.xml"],
                       "Results/rfc-01.out", "Results/rfc-01.err",
                       "Results/rfc-01.xml", "Temp/rfc.xml")
 
     def test_to_stdout(self):
-        check_process(self, [sys.executable, "run.py", "--repair", "--no-xinclude",
+        check_process(self, [sys.executable, test_program, "--repair", "--no-xinclude",
                              "Tests/rfc.xml"], "Results/rfc-02.out", "Results/rfc-02.err",
                       None, None)
 
     def test_to_quiet(self):
-        check_process(self, [sys.executable, "run.py", "--no-xinclude", "--quiet",
+        check_process(self, [sys.executable, test_program, "--no-xinclude", "--quiet",
                              "Tests/rfc.xml"], "Results/rfc-03.out",
                       "Results/rfc-03.err", None, None)
 
     def test_rfc_complete(self):
-        check_process(self, [sys.executable, "run.py", "--repair", "Tests/rfc-svg.xml"],
+        check_process(self, [sys.executable, test_program, "--repair", "Tests/rfc-svg.xml"],
                       "Results/rfc-svg.out", "Results/rfc-svg.err", None, None)
 
     def test_full_tiny(self):
         if not os.path.exists('Temp'):
             os.mkdir('Temp')
-        check_process(self, [sys.executable, "run.py", "--out=Temp/full-tiny.xml",
+        check_process(self, [sys.executable, test_program, "--out=Temp/full-tiny.xml",
                              "--repair", "Tests/full-tiny.xml"],
                       "Results/full-tiny.out", "Results/full-tiny.err",
                       "Results/full-tiny.xml", "Temp/full-tiny.xml")
         print("pass 2")
-        check_process(self, [sys.executable, "run.py", "--out=Temp/full-tiny-02.xml",
+        check_process(self, [sys.executable, test_program, "--out=Temp/full-tiny-02.xml",
                              "Temp/full-tiny.xml"],
                       "Results/full-tiny-02.out", "Results/full-tiny-02.err",
                       None, None)
@@ -299,4 +317,10 @@ def clear_cache(parser):
 
 
 if __name__ == '__main__':
+    if os.environ.get('RFCEDITOR_TEST'):
+        test_program = "run.py"
+    else:
+        test_program = which(test_program)
+        if test_program is None:
+            print("Failed to find the rfclint for testing")
     unittest.main(buffer=True)

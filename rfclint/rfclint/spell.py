@@ -19,10 +19,14 @@ else:
 
 if os.name == 'nt':
     import msvcrt
+
     def get_character():
         return msvcrt.getch()
 else:
-    import tty, sys, termios
+    import tty
+    import sys
+    import termios
+
     def get_character():
         fd = sys.stdin.fileno()
         oldSettings = termios.tcgetattr(fd)
@@ -114,6 +118,7 @@ SpellerColors = {
 
 byte1 = b'\x31'
 byte9 = b'\x39'
+
 
 def which(program):
     def is_exe(fpath):
@@ -488,7 +493,7 @@ class Speller(object):
 
         if allWords[q] in self.ignoreWords or allWords[q].lower() in self.ignoreWords:
             return
-        
+
         ctx = ""
         if q > 0:
             ctx = "".join(allWords[0:q])
@@ -502,7 +507,7 @@ class Speller(object):
 
         list = ""
         for i in range(min(10, len(suggest))):
-            list += "{0}) {1} ".format(chr(i + 0x31), suggest[i]);
+            list += "{0}) {1} ".format(chr(i + 0x31), suggest[i])
 
         log.error(list, additional=2)
         log.write("> ")
@@ -520,7 +525,7 @@ class Speller(object):
                 self.IgnoreWord(allWords[q])
                 return
             elif ch == 'U':
-                self.IgnoreWord(allWords[q].tolower());
+                self.IgnoreWord(allWords[q].tolower())
                 return
             elif ch == 'X':
                 return
@@ -537,5 +542,3 @@ class Speller(object):
             if replaceWord is not None:
                 return
             log.write("\n> ")
-        
-        
