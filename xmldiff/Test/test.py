@@ -6,6 +6,7 @@ import difflib
 import sys
 import subprocess
 import six
+import inspect
 from rfctools_common.parser import XmlRfcParser
 from rfctools_common.parser import XmlRfcError
 from xmldiff.EditItem import EditItem
@@ -14,6 +15,7 @@ from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, diffCo
 from xmldiff.DiffNode import ChangeTagMatching, tagMatching, AddParagraphs
 
 xmldiff_program = "rfc-xmldiff"
+
 
 def which(program):
     def is_exe(fpath):
@@ -347,11 +349,19 @@ def check_process(tester, args, stdoutFile, errFile, generatedFile, compareFile)
             returnValue = False
 
     if generatedFile is not None:
+        template_dir = os.path.abspath(os.path.dirname(inspect.getmodule(EditItem).__file__))
+        template_dir = os.path.abspath(os.path.dirname(inspect.getsourcefile(EditItem)))
+        if os.name == 'nt':
+            template_dir = template_dir.replace('\\', '/')
+        template_dir = 'file:///' + template_dir.lower()
+
         with open(generatedFile, 'r') as f:
             lines2 = f.readlines()
+        lines2 = [line.lower() if 'file://' in line else line for line in lines2]
 
         with open(compareFile, 'r') as f:
             lines1 = f.readlines()
+        lines1 = [line.replace('$TDIR', template_dir) for line in lines1]
 
         d = difflib.Differ()
         result = list(d.compare(lines1, lines2))
@@ -381,4 +391,5 @@ if __name__ == '__main__':
         xmldiff_program = which(xmldiff_program)
         if xmldiff_program is None:
             print("Failed to find the rfc-xmldiff for testing")
+
     unittest.main(buffer=True)
