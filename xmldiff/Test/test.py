@@ -353,7 +353,9 @@ def check_process(tester, args, stdoutFile, errFile, generatedFile, compareFile)
         template_dir = os.path.abspath(os.path.dirname(inspect.getsourcefile(EditItem)))
         if os.name == 'nt':
             template_dir = template_dir.replace('\\', '/')
-        template_dir = 'file:///' + template_dir.lower()
+            template_dir = 'file:///' + template_dir.lower()
+        else:
+            template_dir = 'file:////' + template_dir.lower()
 
         with open(generatedFile, 'r') as f:
             lines2 = f.readlines()
