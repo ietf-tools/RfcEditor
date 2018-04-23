@@ -290,6 +290,7 @@ class Speller(object):
         # self.word_re = re.compile(r'\w+', re.UNICODE | re.MULTILINE)
         self.aspell_re = re.compile(r".\s(\S+)\s(\d+)\s*((\d+): (.+))?", re.UNICODE)
 
+        self.interactive = False
         if config.options.output_filename is not None:
             self.interactive = True
             self.ignoreWords = []
