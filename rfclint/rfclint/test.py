@@ -46,6 +46,27 @@ class Test_Coding(unittest.TestCase):
                          "Found code style errors (and warnings).")
 
 
+class TestCommandLineOptions(unittest.TestCase):
+    """ Run a set of command line checks to make sure they work """
+    def test_get_version(self):
+        check_process(self, [sys.executable, test_program, "--version"],
+                      "Results/version.out", "Results/version.err",
+                      None, None)
+
+    def test_clear_cache(self):
+        if not os.path.exists('Temp'):
+            os.mkdir('Temp')
+        if not os.path.exists('Temp/cache'):
+            os.mkdir('Temp/cache')
+        shutil.copy('Tests/cache_saved/reference.RFC.1847.xml',
+                    'Temp/cache/reference.RFC.1847.xml')
+        check_process(self, [sys.executable, test_program, "--clear-cache",
+                             "--cache=Temp/cache"],
+                      None, None,
+                      None, None)
+        self.assertFalse(os.path.exists('Temp/cache/reference.RFC.1847.xml'))
+
+
 class Test_ConfigFile(unittest.TestCase):
     """ Set of tests dealing with the config file """
     def test_abnf_program_change(self):
