@@ -229,6 +229,8 @@ def check_process(tester, args, stdoutFile, errFile, generatedFile, compareFile)
     if generatedFile and compareFile are not None, compare them to each other
     """
 
+    if args[1][:-4] == '.exe':
+        args = [1:]
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (stdoutX, stderr) = p.communicate()
     p.wait()
