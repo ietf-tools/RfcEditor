@@ -540,7 +540,7 @@ def _replace_slashed_words(str, slashList):
     """ replace slashed separated words the list with
         <word1> &nbsp; / &nbsp; <word 2>
     """
-    match = re.findall(ur'(\w+(/\w+)+)', str)
+    match = re.findall(u'(\w+(/\w+)+)', str)
     for item in match:
         if item[0] in slashList:
             str = re.sub(item[0], slashList[item[0]], str)
