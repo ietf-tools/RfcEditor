@@ -320,6 +320,8 @@ if __name__ == '__main__':
     if os.environ.get('RFCEDITOR_TEST'):
         test_program = "run.py"
     else:
+        if os.name == 'nt':
+            test_program += '.exe'
         test_program = which(test_program)
         if test_program is None:
             print("Failed to find the rfclint for testing")
