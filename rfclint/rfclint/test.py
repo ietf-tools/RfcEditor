@@ -40,7 +40,7 @@ class Test_Coding(unittest.TestCase):
     def test_pycodestyle_conformance(self):
         """Test that we conform to PEP8."""
         pep8style = pycodestyle.StyleGuide(quiet=False, config_file="pycode.cfg")
-        result = pep8style.check_files([test_program, 'abnf.py', 'config.py', 'spell.py',
+        result = pep8style.check_files(['run.py', 'abnf.py', 'config.py', 'spell.py',
                                         'test.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
