@@ -56,9 +56,9 @@ def ReplaceWithSpace(exc):
         return u' '
     elif isinstance(exc, UnicodeEncodeError):
         if six.PY2:
-            return ((exc.end-exc.start)*u' ', exc.end)
+            return ((exc.end - exc.start) * u' ', exc.end)
         else:
-            return (bytes((exc.end-exc.start)*[32]), exc.end)
+            return (bytes((exc.end - exc.start) * [32]), exc.end)
     else:
         raise TypeError("can't handle %s" % type(exc).__name__)
 
@@ -74,7 +74,7 @@ CheckAttributes = {
     'street': ['ascii'],
     'blockquote': ['quotedFrom'],
     'iref': ['item', 'subitem'],
-    }
+}
 
 CutNodes = {
     'annotation': 1,
@@ -442,10 +442,10 @@ class Speller(object):
                     if q >= 0:
                         ctx = ""
                         if q > 0:
-                            ctx = "".join(allWords[max(0, q-self.window):q])
+                            ctx = "".join(allWords[max(0, q - self.window):q])
                         ctx += self.color_start + allWords[q] + self.color_end
                         if q < len(allWords):
-                            ctx += "".join(allWords[q+1:min(q+self.window+1, len(allWords))])
+                            ctx += "".join(allWords[q + 1:min(q + self.window + 1, len(allWords))])
                         log.error(ctx, additional=2)
                 if self.suggest and r[4]:
                     suggest = " ".join(r[4].split()[0:10])
@@ -498,7 +498,7 @@ class Speller(object):
         if q > 0:
             ctx = "".join(allWords[0:q])
         ctx += self.color_start + allWords[q] + self.color_end
-        ctx += "".join(allWords[q+1:])
+        ctx += "".join(allWords[q + 1:])
         log.error("", additional=0)
         log.error(ctx, additional=2)
 

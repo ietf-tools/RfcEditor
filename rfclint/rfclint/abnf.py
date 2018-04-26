@@ -28,8 +28,8 @@ class AbnfChecker(object):
                 # Look for the version that we provide
                 # Match with what is in setup.py
                 if sys.platform == "win32" or sys.platform == "cygwin":
-                    program = os.path.dirname(os.path.realpath(__file__)) + \
-                              "/../bin/bap.exe"
+                    program = os.path.dirname(os.path.realpath(__file__)) \
+                        + "/../bin/bap.exe"
                 elif sys.platform.startswith("linux") or sys.platform == "darwin":
                     program = os.path.dirname(os.path.realpath(__file__)) + "/../bin/bap"
                 else:
@@ -103,7 +103,7 @@ class SourceExtracter(object):
                 file.write(unicode(item.text))
             else:
                 file.write(item.text)
-            lineOffsets.append((item.base, item.sourceline, item.text.count('\n')+1))
+            lineOffsets.append((item.base, item.sourceline, item.text.count('\n') + 1))
 
         self.lineOffsets = lineOffsets
         return True
