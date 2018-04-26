@@ -25,12 +25,17 @@ class AbnfChecker(object):
             program = which(look_for)
 
             if not program:
-                #  Look for the version that we provide
+                # Look for the version that we provide
+                # Match with what is in setup.py
                 if sys.platform == "win32" or sys.platform == "cygwin":
                     program = os.path.dirname(os.path.realpath(__file__)) + \
                               "/../bin/bap.exe"
-                else:
+                elif sys.platform.startswith("linux") or sys.platform == "darwin":
                     program = os.path.dirname(os.path.realpath(__file__)) + "/../bin/bap"
+                else:
+                    raise RfcLintError("No pre-packaged bap exists for the platform " +
+                                       sys.platform +
+                                       " is distributed in the package and bap not found in path.")
                 program = which(program)
                 if not program:
                     raise RfcLintError("The program '{0}' does not exist or is not executable".

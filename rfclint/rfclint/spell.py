@@ -388,13 +388,12 @@ class Speller(object):
         # log.warn(results[i][results[i].rfind(':')+2:])
 
     def getWords(self, tree):
+        words = []
         if tree.text:
             for x in tree.text.splitlines():
                 ll = x.strip()
                 if ll:
-                    words = [(ll, tree)]
-        else:
-            words = []
+                    words += [(ll, tree)]
 
         for node in tree.iterchildren():
             if node.tag in CutNodes:
@@ -449,7 +448,8 @@ class Speller(object):
                             ctx += "".join(allWords[q+1:min(q+self.window+1, len(allWords))])
                         log.error(ctx, additional=2)
                 if self.suggest and r[4]:
-                    log.error(r[4], additional=2)
+                    suggest = " ".join(r[4].split()[0:10])
+                    log.error(suggest, additional=2)
 
         # check for dups
         last = None
