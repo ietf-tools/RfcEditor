@@ -326,5 +326,6 @@ if __name__ == '__main__':
             test_program += '.exe'
         test_program = which(test_program)
         if test_program is None:
-            print("Failed to find the rfclint for testing")
+            print("Failed to find the svgcheck for testing")
+            test_program = "run.py"
     unittest.main(buffer=True)
