@@ -229,7 +229,7 @@ def check_process(tester, args, stdoutFile, errFile, generatedFile, compareFile)
     if generatedFile and compareFile are not None, compare them to each other
     """
 
-    if args[1][:-4] == '.exe':
+    if args[1][-4:] == '.exe':
         args = args[1:]
     print("COMMAND LINE = " + " ".join(args))
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
