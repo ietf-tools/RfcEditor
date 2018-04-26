@@ -230,7 +230,7 @@ def check_process(tester, args, stdoutFile, errFile, generatedFile, compareFile)
     """
 
     if args[1][:-4] == '.exe':
-        args = [1:]
+        args = args[1:]
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (stdoutX, stderr) = p.communicate()
     p.wait()
