@@ -136,7 +136,7 @@ properties = {
     'viewport-fill':         ('none', 'currentColor', 'inherit', '<color>'),
 
     'display':               ('inline', 'block', 'list-item', 'run-in', 'compact',
-                              'marker', 'table', 'inline-table', 'table-row-group',
+                              'table', 'inline-table', 'table-row-group',
                               'table-header-group', 'table-footer-group',
                               'table-row', 'table-column-group',
                               'table-column', 'table-cell', 'table-caption',
@@ -164,7 +164,9 @@ properties = {
 
     'font-size':           (),  # 'inherit'
     'font-family':         ('serif', 'sans-serif', 'monospace', 'inherit'),
-    'font-weight':         ('normal', 'bold', 'bolder', 'lighter', 'inherit'),
+    'font-weight':         ('normal', 'bold', 'bolder', 'lighter', 'inherit',
+                            '100', '200', '300', '400', '500', '600', '700',
+                            '800', '900'),
     'font-style':          ('normal', 'italic', 'oblique', 'inherit'),
     'font-variant':        ('normal', 'small-caps', 'inherit'),
     'direction':           ('ltr', 'rtl', 'inherit'),
@@ -220,7 +222,7 @@ element_children = {  # Elements allowed within other elements
     'textArea':   text_child,
     'text':       text_child,
     'g':          svg_child,
-    'defs':       svg_child,
+    'defs':       svg_child,  # should allow maker as a child
     'use':        ('title', 'desc'),
     'a':          svg_child,
     'tspan':      text_child + ('tbreak',),  # should allow tbreak as a child
