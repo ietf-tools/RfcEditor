@@ -992,6 +992,7 @@ class DiffParagraph(DiffRoot):
     def ToHtml(self, parent):
 
         node = E.LI()
+        node.attrib["where"] = "{0}, {1}".format(self.xml.sourceline, 0)
         parent.append(node)
         if self.deleted:
             n = E.SPAN()

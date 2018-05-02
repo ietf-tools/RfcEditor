@@ -65,6 +65,11 @@ function sync2here(leftFile, leftLine, rightFile, rightLine)
         leftDiv = document.getElementById("leftColumn")
     }
 		    }
+
+                    function OnScrollCenter() {
+                    elem = document.elementFromPoint(0,0)
+                    console.log("---> " + elem.getAttribute('where'))
+                    }
 		    </script>
 </head>
 
@@ -89,7 +94,7 @@ function sync2here(leftFile, leftLine, rightFile, rightLine)
 	    <button type="button" onclick="collapseTree('diffRoot')">Collapse All</button>
 	    <button type="button" onclick="expandDiffs('diffRoot')">Expand Diffs</button>
 	  </div>
-	  <div id="centerColumn">
+	  <div id="centerColumn" onscroll="OnScrollCenter()">
 	    $body
 	  </div>
 	</td>
@@ -104,13 +109,14 @@ function sync2here(leftFile, leftLine, rightFile, rightLine)
     <script>
       convertTrees()
       expandTree("diffRoot")
+      
+      $$(function() {
+        $$("table").colResizable();
+      });
 
       // Get the element with id="defaultOpen" and click on it
       document.getElementById("defaultOpen").click();
 
-      $$(function() {
-        $$("table").colResizable();
-      });      
     </script>
 
 </body>
