@@ -222,7 +222,7 @@ element_children = {  # Elements allowed within other elements
     'textArea':   text_child,
     'text':       text_child,
     'g':          svg_child,
-    'defs':       svg_child,  # should allow maker as a child
+    'defs':       svg_child,
     'use':        ('title', 'desc'),
     'a':          svg_child,
     'tspan':      text_child + ('tbreak',),  # should allow tbreak as a child
@@ -241,5 +241,6 @@ xmlns_urls = (  # Whitelist of allowed URLs
 
 color_map = {
     'rgb(0,0,0)': 'black',
-    'rgb(255,255,255)': 'white'
+    'rgb(255,255,255)': 'white',
+    '#fff': 'white'
 }
