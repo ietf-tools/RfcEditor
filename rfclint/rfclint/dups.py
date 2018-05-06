@@ -137,161 +137,9 @@ def which(program):
     return None
 
 
-class Speller(object):
-    """ Object to deal with processing spelling and duplicates """
+class Dups(object):
+    """ Object to deal with processing duplicates """
     def __init__(self, config):
-        program = config.get('spell', 'program')
-        self.suggest = config.getBoolean('spell', 'suggest', True)
-        self.window = config.getInt('spell', 'window', 15)
-        coloring = config.get('spell', 'color')
-        if coloring and coloring in SpellerColors:
-            self.color_start = SpellerColors[coloring]
-            self.color_end = colorama.Style.RESET_ALL
-            if self.color_start == '':
-                self.color_end = self.color_start
-        elif os.name == 'nt':
-            self.color_start = ''
-            self.color_end = ''
-        else:
-            self.color_start = colorama.Style.BRIGHT
-            self.color_end = colorama.Style.RESET_ALL
-
-        if program:
-            look_for = which(program)
-            if not look_for and os.name == 'nt':
-                look_for = which(program + '.exe')
-            if not look_for:
-                raise RfcLintError("The program '{0}' does not exist or is not executable".
-                                   format(program))
-            program = look_for
-        else:
-            if os.name == "nt":
-                look_for = "aspell.exe"
-                program = which(look_for)
-                if not program:
-                    program = which("c:\\Program Files (x86)\\Aspell\\bin\\aspell.exe")
-            else:
-                look_for = "aspell"
-                program = which(look_for)
-            if not program:
-                raise RfcLintError("The program '{0}' does not exist or is not executable".
-                                   format(look_for))
-
-        spellBaseName = os.path.basename(program)
-        spellBaseName = spellBaseName.replace('.exe', '')
-
-        # I want to know what the program and version really are
-
-        p = subprocess.Popen([program, "-v"], stdout=subprocess.PIPE)
-        (versionOut, stderr) = p.communicate()
-        """
-        if p.returncode != 0:
-            raise RfcLintError("The program '{0}' executed with an error code {1}".
-                               format(program, p.returncode))
-        """
-
-        m = re.match(r".*International Ispell Version [\d.]+ \(but really (\w+) ([\d.]+).*",
-                     versionOut.decode('utf-8'))
-        if m is None:
-            raise RfcLintError("Error starting the spelling program\n{0}".format(line))
-
-        if m.group(1).lower() != spellBaseName:
-            raise RfcLintError("Error: The wrong spelling program was started.  Expected"
-                               "{0} and got {1}".format(spellBaseName, m.group(1)))
-
-        codecs.register_error('replaceWithSpace', ReplaceWithSpace)
-
-        self.iso8859 = False
-        if spellBaseName == 'aspell':
-            log.note("xx - " + m.group(2))
-            if m.group(2)[:3] == '0.5':
-                # This version does not support utf-8
-                self.iso8859 = True
-                log.note("Use iso8859")
-        elif spellBaseName == 'hunspell':
-            # minumum version of hunspell is 1.1.6, but that is probably not something
-            # we would find in the wild anymore.  We are therefore not going to check it.
-            # However, right now the only version I have for Windows does not support utf-8
-            # so until I get a better version, force the use of iso8859 there.
-            if os.name == 'nt':
-                self.iso8859 = True
-                log.note("Use iso8859")
-
-        # now let's build the full command
-
-        cmdLine = [program, '-a']  # always use pipe mode
-        dicts = config.getList('spell', 'dictionaries')
-        if dicts:
-            dictList = ''
-            for dict in dicts:
-                if spellBaseName == 'hunspell':
-                    dict = dict + '.dic'
-                if os.path.isabs(dict):
-                    dict2 = dict
-                else:
-                    dict2 = os.path.join(os.getcwd(), dict)
-                dict2 = os.path.normpath(dict2)
-                if not os.path.exists(dict2):
-                    log.error("Additional Dictionary '{0}' ignored because it was not found".
-                              format(dict.replace('.dic', '')))
-                    continue
-                if spellBaseName == 'aspell':
-                    cmdLine.append("--add-extra-dicts")
-                    cmdLine.append(dict2)
-                else:
-                    dictList = dictList + "," + dict2.replace('.dic', '')
-            if spellBaseName == 'hunspell':
-                cmdLine.append('-d')
-                cmdLine.append("en_US" + dictList)
-
-        dict = config.get('spell', 'personal')
-        if dict:
-            if os.path.isabs(dict):
-                dict2 = dict
-            else:
-                dict2 = os.path.join(os.getcwd(), dict)
-            dict2 = os.path.normpath(dict2)
-            if not os.path.exists(dict2):
-                log.error("Personal Dictionary '{0}' ignored because it was not found".
-                          format(dict))
-            else:
-                cmdLine.append('-p')
-                cmdLine.append(dict2)
-
-        if self.iso8859:
-            if spellBaseName == 'aspell':
-                cmdLine.append('--encoding=iso8859-1')
-            else:
-                # Make sure if we have a better version of hunspell that it will do the right thing
-                cmdLine.append('-i iso-8859-1')
-        elif spellBaseName == 'hunspell':
-            cmdLine.append('-i utf-8')
-
-        log.note("spell command = '{0}'".format(" ".join(cmdLine)))
-        self.p = subprocess.Popen(cmdLine,
-                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        if six.PY2:
-            if os.name == 'nt':
-                self.stdin = codecs.getwriter('iso-8859-1')(self.p.stdin)
-                self.stdout = self.p.stdout
-            else:
-                self.stdin = codecs.getwriter('utf8')(self.p.stdin)
-                self.stdout = self.p.stdout
-                # self.stdout = codecs.getreader('utf8')(self.p.stdout)
-        else:
-            if self.iso8859:
-                self.stdin = io.TextIOWrapper(self.p.stdin, encoding='iso-8859-1',
-                                              errors='replaceWithSpace', line_buffering=True)
-                self.stdout = io.TextIOWrapper(self.p.stdout, encoding='iso-8859-1',
-                                               errors='replaceWithSpace')
-            else:
-                self.stdin = io.TextIOWrapper(self.p.stdin, encoding='utf-8', line_buffering=True)
-                self.stdout = io.TextIOWrapper(self.p.stdout, encoding='utf-8')
-
-        #  Check that we got a good return
-        line = self.stdout.readline()
-        log.note(line)
-
         self.word_re = re.compile(r'(\W*\w+\W*)', re.UNICODE | re.MULTILINE)
         # self.word_re = re.compile(r'\w+', re.UNICODE | re.MULTILINE)
         self.aspell_re = re.compile(r".\s(\S+)\s(\d+)\s*((\d+): (.+))?", re.UNICODE)
@@ -304,71 +152,7 @@ class Speller(object):
             self.ignoreWords = []
             self.lastElement = None
 
-    def processLine(self, allWords):
-        """
-        Process each individual set of words and return the errors found
-        allWords is a tuple of (text string, tree element)
-        returned is an array of tuples each tuple consisting of
-        ( What the error is ('&' or '#'),
-          What the word in error is,
-          The set of alternative words (None for '#'),
-          The offset in the string of the word,
-          The word string,
-          The tree node
-        )
-        """
-        result = []
-        setNo = 0
-        for wordSet in allWords:
-            newLine = u'^ ' + wordSet[0] + u'\n'
-            if self.iso8859:
-                log.note(u"Pre Encode = " + newLine)
-                newLine = newLine.encode('iso-8859-1', 'replaceWithSpace')
-                newLine = newLine.decode('iso-8859-1')
-            else:
-                newLine = newLine  # .encode('utf-8')
-            log.note(newLine)
-            self.stdin.write(newLine)
-
-            index = 0
-            running = 0
-            while True:
-                line = self.stdout.readline()
-                if six.PY2:
-                    if self.iso8859:
-                        #  log.note(" ".join("{:02x}".format(c) for c in line))
-                        line = line.decode('iso-8859-1')
-                    else:
-                        line = line.decode('utf-8')
-                line = line.strip()
-                log.note('spell out line = ' + line)
-
-                if len(line) == 0:
-                    break
-
-                if line[0] == '*':
-                    continue
-
-                m = self.aspell_re.match(line)
-                if not m:
-                    log.error("Internal error trying to match the line '{0}'".format(line))
-                    continue
-
-                if line[0] == '#':
-                    offset = int(m.group(2))
-                    options = None
-                elif line[0] == '&':
-                    offset = int(m.group(4))
-                    options = m.group(5)
-                else:
-                    log.error("internal error - aspell says line is '{0}'".format(line))
-                    continue
-
-                tuple = (line[0], offset, wordSet[1], m.group(1), options, setNo)
-                result.append(tuple)
-            setNo += 1
-
-        return result
+        self.dup_re = re.compile(r'\w[\w\']*\w|\w', re.UNICODE)
 
     def processTree(self, tree):
         # log.warn("processTree - look at node {0}".format(tree.tag))
@@ -378,6 +162,14 @@ class Speller(object):
             self.checkTree(tree)
         for node in tree.iterchildren():
             self.processTree(node)
+
+    def checkAttributes(self, tree):
+        for attr in CheckAttributes[tree.tag]:
+            if attr not in tree.attrib:
+                continue
+            words = [(tree.attrib[attr], tree, attr, 0)]
+            results = self.processLine(words)
+            self.processResults(words, results, attr)
 
     def checkTree(self, tree):
         wordSet = self.getWords(tree)
@@ -390,6 +182,19 @@ class Speller(object):
         #       colorama.Style.RESET_ALL)
         # log.warn(s)
         # log.warn(results[i][results[i].rfind(':')+2:])
+
+    def processLine(self, allWords):
+        """
+        """
+        result = []
+        setNo = 0
+        for wordSet in allWords:
+            for m in re.finditer(r'\w[\w\']*\w|\w', wordSet, re.UNICODE):
+                tuple = (m.start, m.group(1), wordset[1], setNo)
+                result.append(tuple)
+            setNo += 1
+
+        return result
 
     def getWords(self, tree):
         words = []
@@ -412,17 +217,9 @@ class Speller(object):
                     line += 1
                     ll = x.strip()
                     if ll:
-                        words += [(ll, tree, false, line)]
+                        words += [(ll, tree, False, line)]
 
         return words
-
-    def checkAttributes(self, tree):
-        for attr in CheckAttributes[tree.tag]:
-            if attr not in tree.attrib:
-                continue
-            words = [(tree.attrib[attr], tree, True, 0)]
-            results = self.processLine(words)
-            self.processResults(words, results, attr)
 
     def processResults(self, wordSet, results, attributeName):
         """  Process the results coming from a spell check operation """

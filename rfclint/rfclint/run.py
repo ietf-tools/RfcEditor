@@ -262,14 +262,37 @@ def main():
             log.error("Skipping ABNF checking because")
             log.error(e.message, additional=2)
 
-    # do the Spelling and Duplicate checking
+    # do the Spelling checking
     if not options.no_spell:
         try:
             speller = Speller(config)
+            speller.initscr()
             speller.processTree(xmlrfc.tree.getroot())
+            speller.endwin()
         except RfcLintError as e:
             log.error("Skipping spell checking because")
             log.error(e.message, additional=2)
+
+    # do the Duplicate checking
+    if not options.no_dups:
+        try:
+            dups = Dups(config)
+            dups.initscr()
+            dups.processTree(xmlrfc.tree.getroot())
+            dups.endwin()
+        except RfcLintError as e:
+            log.error("Skipping duplicate checking because")
+            log.error(e.message, additional=2)
+
+    if options.output_filename is None:
+        file = sys.stdout
+    else:
+        file = open(options.output_filename, 'w')
+    file.write(lxml.etree.tostring(xmlrfc.tree.getroot(),
+                                    xml_declaration=True,
+                                    encoding='utf-8',
+                                    doctype=xmlrfc.tree.docinfo.doctype,
+                                    pretty_print=True).decode('utf-8'))
 
 
 if __name__ == '__main__':
