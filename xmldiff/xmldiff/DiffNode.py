@@ -626,11 +626,15 @@ class DiffPI(DiffRoot):
         root2.append(root)
         if self.inserted:
             root.attrib['class'] = 'right'
+            root.attrib["whereRight"] = "R{0}_{1}".format(self.xml.sourceline, 0)
         elif self.deleted:
             root.attrib['class'] = 'left'
+            root.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
         elif self.matchNode is None:
             root.attrib['class'] = 'error'
         else:
+            root.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
+            root.attrib["whereRight"] = "R{0}_{1}".format(self.matchNode.xml.sourceline, 0)
             if self.xml.target == self.matchNode.xml.target:
                 if self.xml.text == self.matchNode.xml.text:
                     pass
@@ -767,16 +771,13 @@ class DiffElement(DiffRoot):
 
         root = E.LI()
         parent.append(root)
-        # root.attrib['class'] = 'jstree-open'
-        # anchor = E.A()
-        # anchor.attrib["href"] = '#'
-        # root.append(anchor)
         anchor = root
         if self.deleted:
             # anchor.attrib['onclick'] = 'return sync2here(1, {0}, -1, 0)'.
             # format(self.xml.sourceline)
             node = E.SPAN()
             node.attrib["class"] = 'left'
+            root.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
             node.text = "<" + self.xml.tag
             anchor.append(node)
             if len(self.xml.attrib):
@@ -787,6 +788,7 @@ class DiffElement(DiffRoot):
             # format(self.xml.sourceline)
             node = E.SPAN()
             node.attrib['class'] = 'right'
+            root.attrib["whereRight"] = "R{0}_{1}".format(self.xml.sourceline, 0)
             node.text = "<" + self.xml.tag
             anchor.append(node)
             if len(self.xml.attrib):
@@ -803,6 +805,8 @@ class DiffElement(DiffRoot):
                 for key in self.xml.attrib.iterkeys():
                     node.text = node.text + " " + key + '="' + self.xml.attrib[key] + '"'
         else:
+            root.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
+            root.attrib["whereRight"] = "R{0}_{1}".format(self.matchNode.xml.sourceline, 0)
             # anchor.attrib['onclick'] = 'return sync2here(1, {0},  1, {1})' \
             #      .format(self.xml.sourceline, self.matchNode.xml.sourceline)
             if self.xml.tag == self.matchNode.xml.tag:
@@ -855,14 +859,20 @@ class DiffElement(DiffRoot):
                 child.ToHtml(ul)
 
             li = E.LI()
-            # li.attrib['class'] = 'jstree-open'
             s = E.SPAN()
             li.append(s)
             s.text = "</" + self.xml.tag + ">"
             if self.deleted:
                 s.attrib['class'] = 'left'
+                li.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
             elif self.inserted:
                 s.attrib['class'] = 'right'
+                li.attrib["whereRight"] = "R{0}_{1}".format(self.xml.sourceline, 0)
+            else:
+                li.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
+                li.attrib["whereRight"] = "R{0}_{1}".format(self.matchNode.xml.sourceline, 0)
+                li.attrib["src"] = "DiffElement-End"
+                
             ul.append(li)
             root.append(ul)
         else:
@@ -992,16 +1002,17 @@ class DiffParagraph(DiffRoot):
     def ToHtml(self, parent):
 
         node = E.LI()
-        node.attrib["where"] = "{0}, {1}".format(self.xml.sourceline, 0)
         parent.append(node)
         if self.deleted:
             n = E.SPAN()
             n.attrib["class"] = 'left'
+            node.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
             self.fixPreserveSpace(n, self.toText())
             node.append(n)
         elif self.inserted:
             n = E.SPAN()
             n.attrib['class'] = 'right'
+            node.attrib["whereRight"] = "R{0}_{1}".format(self.xml.sourceline, 0)
             self.fixPreserveSpace(n, self.toText())
             node.append(n)
         elif self.matchNode is None:
@@ -1011,6 +1022,8 @@ class DiffParagraph(DiffRoot):
             node.append(n)
         else:
             self.diffTextToHtml(self.toText(), self.matchNode.toText(), node)
+            node.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
+            node.attrib["whereRight"] = "R{0}_{1}".format(self.matchNode.xml.sourceline, 0)
 
     def updateCost(self, right):
         leftText = self.toText()
