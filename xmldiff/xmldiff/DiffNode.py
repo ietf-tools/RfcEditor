@@ -427,6 +427,8 @@ class DiffDocument(DiffRoot):
         #  Insert xml declarations
 
         n = E.LI()
+        n.attrib['whereLeft'] = "L0_0"
+        n.attrib['whereRight'] = "R0_0"
         leftText = '<?xml version="{0}" encoding="{1}"?>'.format(self.xml.docinfo.xml_version,
                                                                  self.xml.docinfo.encoding)
         rightText = '<?xml version="{0}" encoding="{1}"?>'. \
@@ -743,12 +745,12 @@ class DiffElement(DiffRoot):
             DiffRoot.__init__(self, xmlNode, parent)
 
             if xmlNode.text is not None:
-                self.children.append(DiffText(xmlNode.text, self))
+                self.children.append(DiffText(xmlNode.text, xmlNode, self))
 
             for c in xmlNode.iterchildren():
                 self.children.append(self.createNode(c, self))
                 if c.tail is not None and c.tail.rstrip() != '':
-                    self.children.append(DiffText(c.tail, self))
+                    self.children.append(DiffText(c.tail, xmlNode, self))
         else:
             DiffRoot.__init__(self, xmlNode.xml, parent)
 
@@ -871,8 +873,8 @@ class DiffElement(DiffRoot):
             else:
                 li.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
                 li.attrib["whereRight"] = "R{0}_{1}".format(self.matchNode.xml.sourceline, 0)
-                li.attrib["src"] = "DiffElement-End"
-                
+                # li.attrib["src"] = "DiffElement-End"
+
             ul.append(li)
             root.append(ul)
         else:
@@ -908,12 +910,12 @@ class DiffElement(DiffRoot):
 
 
 class DiffText(DiffRoot):
-    def __init__(self, text, parent):
-        DiffRoot.__init__(self, None, parent)
+    def __init__(self, text, xmlNode, parent):
+        DiffRoot.__init__(self, xmlNode, parent)
         self.text = text
 
     def cloneTree(self, parent):
-        clone = DiffText(self.text, parent)
+        clone = DiffText(self.text, self.xml, parent)
         clone.matchNode = self
         clone.inserted = True
         self.matchNode = clone
@@ -928,11 +930,13 @@ class DiffText(DiffRoot):
         if self.deleted:
             n = E.SPAN()
             n.attrib["class"] = 'left'
+            node.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
             n.text = self.text
             node.append(n)
         elif self.inserted:
             n = E.SPAN()
             n.attrib["class"] = 'right'
+            node.attrib["whereRight"] = "R{0}_{1}".format(self.xml.sourceline, 0)
             n.text = self.text
             node.append(n)
         elif self.matchNode is None:
@@ -941,6 +945,8 @@ class DiffText(DiffRoot):
             n.text = self.text
             node.append(n)
         else:
+            node.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
+            node.attrib["whereRight"] = "R{0}_{1}".format(self.matchNode.xml.sourceline, 0)
             if self.text == self.matchNode.text:
                 node.text = self.text
             else:
