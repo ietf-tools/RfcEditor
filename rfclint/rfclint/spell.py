@@ -298,8 +298,10 @@ class Speller(object):
 
         self.dupword_re = re.compile(r'\W*([\w\']+)\W*', re.UNICODE)
 
+        self.no_curses = False
         self.interactive = False
-        if True or config.options.output_filename is not None:
+        self.curses = None
+        if config.options.output_filename is not None:
             self.interactive = True
             self.ignoreWords = []
             self.lastElement = None
@@ -408,11 +410,11 @@ class Speller(object):
 
             if node.tail:
                 line = -1
-                for x in tree.tail.splitlines():
+                for x in node.tail.splitlines():
                     line += 1
                     ll = x.strip()
                     if ll:
-                        words += [(ll, tree, false, line)]
+                        words += [(ll, tree, False, line)]
 
         return words
 
@@ -444,7 +446,8 @@ class Speller(object):
                 self.Interact(r, matchGroups, allWords)
             else:
                 if attributeName:
-                    log.error("Misspelled word '{0}' in attribute '{1}'".format(r[3], attributeName),
+                    log.error("Misspelled word '{0}' in attribute '{1}'".format(r[3],
+                                                                                attributeName),
                               where=r[2])
                 else:
                     log.error(u"Misspelled word was found '{0}'".format(r[3]), where=r[2])
@@ -461,22 +464,6 @@ class Speller(object):
                 if self.suggest and r[4]:
                     suggest = " ".join(r[4].split()[0:10])
                     log.error(suggest, additional=2)
-
-        # check for dups
-        last = None
-        for (m, el, inText, lineNo) in matchGroups:
-            w1 = self.dupword_re.match(m.group(0))
-            if w1 is None:
-                pass
-            g = w1.group(1)
-            if last:
-                if last == g:
-                    if self.interactive:
-                        offset = m.start(0) + w1.start(1)
-                        self.interactiveDup(g, offset, el, matchGroups, allWords)
-                    else:
-                        log.error("Duplicate word found '{0}'".format(last), where=el)
-            last = g
 
     def wordIndex(self, offset, el, matchArray):
         """
@@ -506,7 +493,7 @@ class Speller(object):
         #  ? - Print help
         #
 
-        self.window.erase()
+        self.curses.erase()
 
         q = self.wordIndex(r[1], r[2], matchGroups)
 
@@ -529,10 +516,11 @@ class Speller(object):
         else:
             fileName = os.path.relpath(fileName)
 
-        self.window.addstr(curses.LINES-15, 0, self.spaceline, curses.A_REVERSE)
-        self.window.addstr(curses.LINES-14, 0, u"{1}:{2} Misspelled word was found '{0}'".format(r[3], fileName, r[2].sourceline))
-        self.window.addstr(curses.LINES-13, 0, self.spaceline, curses.A_REVERSE)
-        self.window.addstr(0, 0, ctx)
+        self.curses.addstr(curses.LINES-15, 0, self.spaceline, curses.A_REVERSE)
+        self.curses.addstr(curses.LINES-14, 0, u"{1}:{2} Misspelled word was found '{0}'"
+                           .format(r[3], fileName, r[2].sourceline))
+        self.curses.addstr(curses.LINES-13, 0, self.spaceline, curses.A_REVERSE)
+        self.curses.addstr(0, 0, ctx)
 
         # log.error("", additional=0)
         # log.error(ctx, additional=2)
@@ -545,29 +533,30 @@ class Speller(object):
         #     list += "{0}) {1} ".format(chr(i + 0x31), suggest[i])
 
         for i in range(min(10, len(suggest))):
-            self.window.addstr(int(i/2) + curses.LINES-12, (i%2)*40, "{0}) {1}".format(chr(i+0x31), suggest[i]))
+            self.curses.addstr(int(i/2) + curses.LINES-12, (i % 2)*40, "{0}) {1}".
+                               format(chr(i+0x31), suggest[i]))
 
-        self.window.addstr(curses.LINES-2, 0, self.spaceline, curses.A_REVERSE)
-        self.window.addstr(curses.LINES-1, 0, "?")
-        self.window.refresh()
+        self.curses.addstr(curses.LINES-2, 0, self.spaceline, curses.A_REVERSE)
+        self.curses.addstr(curses.LINES-1, 0, "?")
+        self.curses.refresh()
 
         replaceWord = None
 
         while (True):
             # ch = get_character()
-            ch = self.window.getch()
+            ch = self.curses.getch()
             if ch == ord(' '):
                 return
             if ch == '?':
                 self.PrintHelp()
             elif ch == ord('Q') or ch == ord('q'):
-                self.window.addstr(curses.LINES-1, 0, "Are you sure you want to abort?")
-                self.window.refresh()
-                ch = self.window.getch()
+                self.curses.addstr(curses.LINES-1, 0, "Are you sure you want to abort?")
+                self.curses.refresh()
+                ch = self.curses.getch()
                 if ch == ord('Y') or ch == ord('y'):
                     sys.exit(1)
-                self.window.addstr(curses.LINES-1, 0, "?" + ' '*30)
-                self.window.refresh()
+                self.curses.addstr(curses.LINES-1, 0, "?" + ' '*30)
+                self.curses.refresh()
             elif ch == ord('I'):
                 self.IgnoreWord(allWords[q])
                 return
@@ -599,20 +588,21 @@ class Speller(object):
         if self.lastElement != r[2]:
             self.offset = 0
             self.lastElement = r[2]
-        textOut = textIn[:r[1]-2 + self.offset] + replaceWord + textIn[r[1]-2+self.offset+len(r[3]):]
+        textOut = textIn[:r[1]-2 + self.offset] + replaceWord + \
+            textIn[r[1]-2+self.offset+len(r[3]):]
         self.offset += len(replaceWord) - len(r[3])
         return textOut
 
     def interactiveDup(self, word, offset, element, matchGroups, allWords):
-        self.window.erase()
+        self.curses.erase()
 
         q = self.wordIndex(offset, element, matchGroups)
 
-        self.window.move(0, 0)
+        self.curses.move(0, 0)
         if q > 0:
-            self.window.addstr("".join(allWords[0:q]))
-        self.window.addstr(allWords[q], curses.A_REVERSE)
-        self.window.addstr("".join(allWords[q + 1:]))
+            self.curses.addstr("".join(allWords[0:q]))
+        self.curses.addstr(allWords[q], curses.A_REVERSE)
+        self.curses.addstr("".join(allWords[q + 1:]))
 
         fileName = element.base
         if fileName.startswith("file:///"):
@@ -624,37 +614,38 @@ class Speller(object):
         else:
             fileName = os.path.relpath(fileName)
 
-        self.window.addstr(curses.LINES-15, 0, self.spaceline, curses.A_REVERSE)
-        self.window.addstr(curses.LINES-14, 0, u"{1}:{2} Duplicate word found '{0}'".format(word, fileName, element.sourceline))
-        self.window.addstr(curses.LINES-13, 0, self.spaceline, curses.A_REVERSE)
+        self.curses.addstr(curses.LINES-15, 0, self.spaceline, curses.A_REVERSE)
+        self.curses.addstr(curses.LINES-14, 0, u"{1}:{2} Duplicate word found '{0}'".
+                           format(word, fileName, element.sourceline))
+        self.curses.addstr(curses.LINES-13, 0, self.spaceline, curses.A_REVERSE)
 
-        self.window.addstr(curses.LINES-2, 0, self.spaceline, curses.A_REVERSE)
-        self.window.addstr(curses.LINES-1, 0, "?")
+        self.curses.addstr(curses.LINES-2, 0, self.spaceline, curses.A_REVERSE)
+        self.curses.addstr(curses.LINES-1, 0, "?")
 
-        self.window.addstr(curses.LINES-11, 0, " ) Ignore")
-        self.window.addstr(curses.LINES-10, 0, "D) Delete Word")
-        self.window.addstr(curses.LINES-9, 0, "R) Replace Word")
-        self.window.addstr(curses.LINES-8, 0, "Q) Quit")
-        self.window.addstr(curses.LINES-7, 0, "X) Exit")
+        self.curses.addstr(curses.LINES-11, 0, " ) Ignore")
+        self.curses.addstr(curses.LINES-10, 0, "D) Delete Word")
+        self.curses.addstr(curses.LINES-9, 0, "R) Replace Word")
+        self.curses.addstr(curses.LINES-8, 0, "Q) Quit")
+        self.curses.addstr(curses.LINES-7, 0, "X) Exit")
 
-        self.window.addstr(curses.LINES-1, 0, "?")
-        self.window.refresh()
+        self.curses.addstr(curses.LINES-1, 0, "?")
+        self.curses.refresh()
 
         while (True):
             # ch = get_character()
-            ch = self.window.getch()
+            ch = self.curses.getch()
             if ch == ord(' '):
                 return
             if ch == '?':
                 self.PrintHelp()
             elif ch == ord('Q') or ch == ord('q'):
-                self.window.addstr(curses.LINES-1, 0, "Are you sure you want to abort?")
-                self.window.refresh()
-                ch = self.window.getch()
+                self.curses.addstr(curses.LINES-1, 0, "Are you sure you want to abort?")
+                self.curses.refresh()
+                ch = self.curses.getch()
                 if ch == ord('Y') or ch == ord('y'):
                     sys.exit(1)
-                self.window.addstr(curses.LINES-1, 0, "?" + ' '*30)
-                self.window.refresh()
+                self.curses.addstr(curses.LINES-1, 0, "?" + ' '*30)
+                self.curses.refresh()
             elif ch == ord('D'):
                 element.text = self.removeText(element.text, word, offset, element)
                 return
@@ -670,22 +661,23 @@ class Speller(object):
             self.offset = 0
             self.lastElement = el
         textOut = textIn[:offset + self.offset] + textIn[offset+self.offset+len(word):]
-        self.offset +=  - len(word)
+        self.offset += - len(word)
         return textOut
 
     def initscr(self):
         try:
-            self.window = curses.initscr()
-            curses.start_color()
-            curses.noecho()
-            curses.cbreak()
-            self.spaceline = " "*curses.COLS
+            if not self.no_curses:
+                self.curses = curses.initscr()
+                curses.start_color()
+                curses.noecho()
+                curses.cbreak()
+                self.spaceline = " "*curses.COLS
 
         except curses.error as e:
-            self.window = None
+            self.curses = None
 
     def endwin(self):
-        if self.window:
+        if self.curses:
             curses.nocbreak()
             curses.echo()
             curses.endwin()

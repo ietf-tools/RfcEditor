@@ -93,15 +93,15 @@ Tests/spell.xml:135: Misspelled word 'txtr' in attribute 'quotedFrom'
 Tests/spell.xml:136: Misspelled word was found 'allwos'
   This allwos for a text item to be a child 
 Tests/spell.xml:138: Misspelled word was found 'compliated'
-  this is compliated by MUST  MUST be dropped or MUST  must not be dropped Text here can be 
+  this is compliated by MUST MUST be dropped or MUST must not be dropped Text here can be 
 Tests/spell.xml:142: Misspelled word was found 'nstted'
-  by MUST  MUST be dropped or MUST  must not be dropped Text here can be nstted  for fun can have content the protocol overrreview THis is a normal text item. THis 
+  by MUST MUST be dropped or MUST must not be dropped Text here can be nstted for fun can have content the protocol overrreview THis is a normal text item. THis 
 Tests/spell.xml:145: Misspelled word was found 'overrreview'
-  not be dropped Text here can be nstted  for fun can have content the protocol overrreview THis is a normal text item. THis is a normal textt item Need to text 
+  not be dropped Text here can be nstted for fun can have content the protocol overrreview THis is a normal text item. THis is a normal textt item Need to text 
 Tests/spell.xml:146: Misspelled word was found 'THis'
-  be dropped Text here can be nstted  for fun can have content the protocol overrreview THis is a normal text item. THis is a normal textt item Need to text de-
+  be dropped Text here can be nstted for fun can have content the protocol overrreview THis is a normal text item. THis is a normal textt item Need to text de-
 Tests/spell.xml:146: Misspelled word was found 'THis'
-  nstted  for fun can have content the protocol overrreview THis is a normal text item. THis is a normal textt item Need to text de-duplicatte Tex is now mono-spaced 
+  nstted for fun can have content the protocol overrreview THis is a normal text item. THis is a normal textt item Need to text de-duplicatte Tex is now mono-spaced 
 Tests/spell.xml:146: Misspelled word was found 'textt'
   have content the protocol overrreview THis is a normal text item. THis is a normal textt item Need to text de-duplicatte Tex is now mono-spaced references can contain text 
 Tests/spell.xml:147: Misspelled word was found 'de'
