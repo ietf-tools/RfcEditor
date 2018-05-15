@@ -448,6 +448,26 @@ class Test_Regressions(unittest.TestCase):
                       None, None)
 
 
+class Test_DupChecks(unittest.TestCase):
+    def test_batch(self):
+        """ Check batch mode duplicate detection """
+        check_process(self, [sys.executable, test_program, "--no-rng", "--no-spell",
+                             "Tests/Dups.xml"],
+                      "Results/empty", "Results/DupsB.err", None, None)
+
+    def test_interactive1(self):
+        check_process(self, [sys.executable, test_program, "--no-rng", "--no-spell",
+                             "--out=Temp/dups.xml", "Tests/Dups.xml"],
+                      "Results/Dups1.out", "Results/Dups1.err",
+                      "Results/Dups1.xml", "Temp/dups.xml", input="Tests/Dups1.in")
+
+    def test_interactive2(self):
+        check_process(self, [sys.executable, test_program, "--no-rng", "--no-spell",
+                             "--out=Temp/dups.xml", "Tests/Dups.xml"],
+                      "Results/Dups2.out", "Results/Dups2.err",
+                      "Results/Dups2.xml", "Temp/dups.xml", input="Tests/Dups2.in")
+
+
 def compare_file(errFile, stderr, displayError):
     if six.PY2:
         with open(errFile, 'r') as f:
@@ -482,7 +502,7 @@ def compare_file(errFile, stderr, displayError):
     return True
 
 
-def check_process(tester, args, stdoutFile, errFiles, generatedFile, compareFile):
+def check_process(tester, args, stdoutFile, errFiles, generatedFile, compareFile, input=None):
     """
     Execute a subprocess using args as the command line.
     if stdoutFile is not None, compare it to the stdout of the process
@@ -494,8 +514,14 @@ def check_process(tester, args, stdoutFile, errFiles, generatedFile, compareFile
 
     if args[1][-4:] == '.exe':
         args = args[1:]
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    (stdoutX, stderr) = p.communicate()
+    inputString = None
+    inputX = None
+    if input:
+        with open(input, 'rb') as f:
+            inputString = f.read()
+        inputX = subprocess.PIPE
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=inputX)
+    (stdoutX, stderr) = p.communicate(input=inputString)
 
     returnValue = True
     if stdoutFile is not None:

@@ -115,7 +115,13 @@ class Dups(object):
                         if self.interactive:
                             self.Interact(words[1], w, -1, allWords, wordSet, words)
                         else:
-                            log.error("Duplicate word found '{0}'".format(last), where=words[1])
+                            if attributeName:
+                                log.error("Duplicate word found '{0}' in attribute '{1}'".
+                                          format(last, attributeName), where=words[1])
+                            else:
+                                log.error("Duplicate word found '{0}'".format(last),
+                                          where=words[1])
+
                 last = g
 
     def wordIndex(self, offset, el, matchArray):
@@ -215,7 +221,9 @@ class Dups(object):
             if ch == ' ':
                 return
             if ch == '?':
-                self.PrintHelp()
+                if not self.window:
+                    log.error("HELP:  ) Ignore, D) Delete Word, R) Replace Word, Q) Quit, X) Exit.",
+                              additional=0)
             elif ch == 'Q' or ch == 'q':
                 if self.window:
                     self.window.addstr(curses.LINES-1, 0, "Are you sure you want to abort?")
@@ -241,6 +249,25 @@ class Dups(object):
             elif ch == 'X':
                 return
             elif ch == 'R':
+                if self.window:
+                    self.window.addstr(curses.LINES-1, 0, "Replace with: ")
+                    self.window.refresh()
+                    ch = ''
+                    while True:
+                        ch2 = chr(self.window.getch())
+                        if ch2 == '\n':
+                            break
+                        ch += ch2
+                else:
+                    ch = input("Replace with: ")
+
+                if isinstance(line[2], str):
+                    element.attrib[line[2]] = self.replaceText(element.attrib[line[2]], ch, match,
+                                                               srcLine, element)
+                elif words[2]:
+                    element.text = self.replaceText(element.text, ch, match, srcLine, element)
+                else:
+                    element.tail = self.replaceText(element.tail, ch, match, srcLine, element)
                 return
             else:
                 pass
@@ -248,6 +275,16 @@ class Dups(object):
     def removeText(self, textIn, match, srcLine, el):
         textOut = textIn[:match.start() + self.offset] + textIn[match.end()+self.offset:]
         self.offset += -(match.end() - match.start())
+        return textOut
+
+    def replaceText(self, textIn, replaceWord, match, srcLine, el):
+        startChar = match.start() + self.offset
+        while textIn[startChar] == ' ':
+            startChar += 1
+
+        textOut = textIn[:startChar] + replaceWord + \
+            textIn[match.end()+self.offset:]
+        self.offset += len(replaceWord) - (match.end() - match.start())
         return textOut
 
     def writeString(self, text, color=curses.A_NORMAL, partialString=False):
