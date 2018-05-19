@@ -302,7 +302,7 @@ class Speller(object):
         self.no_curses = False
         self.interactive = False
         self.curses = None
-        if True or config.options.output_filename is not None:
+        if config.options.output_filename is not None:
             self.interactive = True
             self.ignoreWords = []
             self.lastElement = None
