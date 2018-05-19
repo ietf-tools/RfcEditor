@@ -351,6 +351,19 @@ class Test_Spell(unittest.TestCase):
                              "Tests/spell-utf8.xml"],
                       "Results/spell-utf8-dict.out", "Results/spell-utf8-dict.err", None, None)
 
+    def test_spell_interact1(self):
+        """ Interative spelling test #1 """
+        try:
+            os.mkdir("Temp")
+        except OSError as e:
+            pass
+        shutil.copyfile("Tests/en.pws", "Temp/en.pws")
+        check_process(self, [sys.executable, test_program, "--no-rng", "--no-dup-detection",
+                             "--personal=Temp/en.pws", "-o", "Temp/Spell2.xml", "Tests/spell2.xml"],
+                      "Results/Spell1.out", "Results/Spell1.err", "Temp/Spell2.xml", "Results/Spell1.xml",
+                      input="Tests/Spell1.in")
+        self.assertTrue(compare_file("Temp/en.pws", "Results/en-1.pws", True),
+                        "Result word lists differ")
 
 class Test_Spell_Hunspell(unittest.TestCase):
     """ Set of tests dealing with the spell checker API """
@@ -476,6 +489,9 @@ def compare_file(errFile, stderr, displayError):
     else:
         with open(errFile, 'r', encoding='utf8') as f:
             lines2 = f.readlines()
+        if isinstance(stderr, str):
+            with open(stderr, 'rb') as f:
+                stderr = f.read()
         lines1 = stderr.decode('utf-8').splitlines(True)
 
     if os.name == 'nt':

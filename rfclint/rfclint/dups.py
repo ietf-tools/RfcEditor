@@ -23,10 +23,9 @@ class Dups(object):
 
         self.interactive = False
         self.no_curses = False
-        self.window = None
+        self.curses = None
         if config.options.output_filename is not None:
             self.interactive = True
-            self.ignoreWords = []
             self.lastElement = None
             self.textLocation = True
 
@@ -54,12 +53,6 @@ class Dups(object):
         results = self.processLine(wordSet)
 
         self.processResults(wordSet, results, None)
-
-        # s = " ".join(words[max(0, i-10):min(len(words), i+10)])
-        # s = s.replace(words[i], colorama.Fore.GREEN + ">>>" + words[i] + "<<<" +
-        #       colorama.Style.RESET_ALL)
-        # log.warn(s)
-        # log.warn(results[i][results[i].rfind(':')+2:])
 
     def processLine(self, allWords):
         """
@@ -124,23 +117,11 @@ class Dups(object):
 
                 last = g
 
-    def wordIndex(self, offset, el, matchArray):
-        """
-        Given an offset and element, find the index in the matchArray that matches
-        """
-
-        for i in range(len(matchArray)):
-            m = matchArray[i]
-            if m[1] == el and \
-               (m[0].start(1) <= offset and offset < m[0].end(1)):
-                return i
-        return -1
-
     def Interact(self, element, match, srcLine, allWords, wordSet, words):
-        if self.window:
-            self.window.erase()
+        if self.curses:
+            self.curses.erase()
 
-            self.window.move(0, 0)
+            self.curses.move(0, 0)
 
         fileName = element.base
         if fileName.startswith("file:///"):
@@ -156,13 +137,13 @@ class Dups(object):
         self.x = 0
         self.y = 0
 
-        if self.window:
+        if self.curses:
             if isinstance(words[2], str):
-                self.window.addstr(curses.LINES-14, 0,
+                self.curses.addstr(curses.LINES-14, 0,
                                    u"{1}:{2} Duplicate word '{0}' found in attribute '{3}'".
                                    format(match.group(0), fileName, element.sourceline, words[2]))
             else:
-                self.window.addstr(curses.LINES-14, 0, u"{1}:{2} Duplicate word found '{0}'".
+                self.curses.addstr(curses.LINES-14, 0, u"{1}:{2} Duplicate word found '{0}'".
                                    format(match.group(0), fileName, element.sourceline))
         else:
             log.write("")
@@ -193,68 +174,68 @@ class Dups(object):
                 self.writeString(text)
             y += 1
 
-        if self.window:
-            self.window.addstr(curses.LINES-15, 0, self.spaceline, curses.A_REVERSE)
-            self.window.addstr(curses.LINES-13, 0, self.spaceline, curses.A_REVERSE)
+        if self.curses:
+            self.curses.addstr(curses.LINES-15, 0, self.spaceline, curses.A_REVERSE)
+            self.curses.addstr(curses.LINES-13, 0, self.spaceline, curses.A_REVERSE)
 
-            self.window.addstr(curses.LINES-2, 0, self.spaceline, curses.A_REVERSE)
-            self.window.addstr(curses.LINES-1, 0, "?")
+            self.curses.addstr(curses.LINES-2, 0, self.spaceline, curses.A_REVERSE)
+            self.curses.addstr(curses.LINES-1, 0, "?")
 
-            self.window.addstr(curses.LINES-11, 0, " ) Ignore")
-            self.window.addstr(curses.LINES-10, 0, "D) Delete Word")
-            self.window.addstr(curses.LINES-9, 0, "R) Replace Word")
-            self.window.addstr(curses.LINES-8, 0, "Q) Quit")
-            self.window.addstr(curses.LINES-7, 0, "X) Exit")
+            self.curses.addstr(curses.LINES-11, 0, " ) Ignore")
+            self.curses.addstr(curses.LINES-10, 0, "D) Delete Word")
+            self.curses.addstr(curses.LINES-9, 0, "R) Replace Word")
+            self.curses.addstr(curses.LINES-8, 0, "Q) Quit")
+            self.curses.addstr(curses.LINES-7, 0, "X) Exit")
 
-            self.window.addstr(curses.LINES-1, 0, "?")
-            self.window.refresh()
+            self.curses.addstr(curses.LINES-1, 0, "?")
+            self.curses.refresh()
         else:
             log.write("")
 
         while (True):
             # ch = get_character()
-            if self.window:
-                ch = chr(self.window.getch())
+            if self.curses:
+                ch = chr(self.curses.getch())
             else:
                 ch = input("? ")[0]
 
             if ch == ' ':
                 return
             if ch == '?':
-                if not self.window:
+                if not self.curses:
                     log.error("HELP:  ) Ignore, D) Delete Word, R) Replace Word, Q) Quit, X) Exit.",
                               additional=0)
             elif ch == 'Q' or ch == 'q':
-                if self.window:
-                    self.window.addstr(curses.LINES-1, 0, "Are you sure you want to abort?")
-                    self.window.refresh()
-                    ch = self.window.getch()
+                if self.curses:
+                    self.curses.addstr(curses.LINES-1, 0, "Are you sure you want to abort?")
+                    self.curses.refresh()
+                    ch = self.curses.getch()
                 else:
                     ch = input("Are you sure you want to abort? ")[0]
                 if ch == 'Y' or ch == 'y':
                     sys.exit(1)
 
-                if self.window:
-                    self.window.addstr(curses.LINES-1, 0, "?" + ' '*30)
-                    self.window.refresh()
+                if self.curses:
+                    self.curses.addstr(curses.LINES-1, 0, "?" + ' '*30)
+                    self.curses.refresh()
             elif ch == 'D' or ch == 'd':
                 if isinstance(line[2], str):
                     element.attrib[line[2]] = self.removeText(element.attrib[line[2]], match,
-                                                              srcLine, element)
+                                                              element)
                 elif words[2]:
-                    element.text = self.removeText(element.text, match, srcLine, element)
+                    element.text = self.removeText(element.text, match, element)
                 else:
-                    element.tail = self.removeText(element.tail, match, srcLine, element)
+                    element.tail = self.removeText(element.tail, match, element)
                 return
             elif ch == 'X':
                 return
             elif ch == 'R':
-                if self.window:
-                    self.window.addstr(curses.LINES-1, 0, "Replace with: ")
-                    self.window.refresh()
+                if self.curses:
+                    self.curses.addstr(curses.LINES-1, 0, "Replace with: ")
+                    self.curses.refresh()
                     ch = ''
                     while True:
-                        ch2 = chr(self.window.getch())
+                        ch2 = chr(self.curses.getch())
                         if ch2 == '\n':
                             break
                         ch += ch2
@@ -263,21 +244,21 @@ class Dups(object):
 
                 if isinstance(line[2], str):
                     element.attrib[line[2]] = self.replaceText(element.attrib[line[2]], ch, match,
-                                                               srcLine, element)
+                                                               element)
                 elif words[2]:
-                    element.text = self.replaceText(element.text, ch, match, srcLine, element)
+                    element.text = self.replaceText(element.text, ch, match, element)
                 else:
-                    element.tail = self.replaceText(element.tail, ch, match, srcLine, element)
+                    element.tail = self.replaceText(element.tail, ch, match, element)
                 return
             else:
                 pass
 
-    def removeText(self, textIn, match, srcLine, el):
+    def removeText(self, textIn, match, el):
         textOut = textIn[:match.start() + self.offset] + textIn[match.end()+self.offset:]
         self.offset += -(match.end() - match.start())
         return textOut
 
-    def replaceText(self, textIn, replaceWord, match, srcLine, el):
+    def replaceText(self, textIn, replaceWord, match, el):
         startChar = match.start() + self.offset
         while textIn[startChar] == ' ':
             startChar += 1
@@ -290,26 +271,26 @@ class Dups(object):
     def writeString(self, text, color=curses.A_NORMAL, partialString=False):
         newLine = False
         cols = 80
-        if self.window:
+        if self.curses:
             cols = curses.COLS
         for line in text.splitlines(1):
             if line[:-1] == '\n':
                 newLine = True
                 line = line[:-1]
             while self.x + len(line) >= cols:
-                if self.window:
-                    self.window.addstr(self.y, self.x, line[:cols-self.x - 2], color)
-                    self.window.addstr("/", color)
+                if self.curses:
+                    self.curses.addstr(self.y, self.x, line[:cols-self.x - 2], color)
+                    self.curses.addstr("/", color)
                 else:
                     log.write_on_line(line[:cols-self.x - 2])
                     log.write_on_line("/")
                 line = line[cols-self.x-2:]
                 self.x = 0
                 self.y += 1
-                if not self.window:
+                if not self.curses:
                     log.write("")
-            if self.window:
-                self.window.addstr(self.y, self.x, line, color)
+            if self.curses:
+                self.curses.addstr(self.y, self.x, line, color)
             else:
                 log.write_on_line(line)
             self.x += len(line)
@@ -317,7 +298,7 @@ class Dups(object):
                 if self.x != 0:
                     self.x = 0
                     self.y += 1
-                    if not self.window:
+                    if not self.curses:
                         log.write("")
                 newLine = False
             if self.x != 0 and line[-1] != ' ' and not partialString:
@@ -326,17 +307,17 @@ class Dups(object):
     def initscr(self):
         try:
             if not self.no_curses:
-                self.window = curses.initscr()
+                self.curses = curses.initscr()
                 curses.start_color()
                 curses.noecho()
                 curses.cbreak()
                 self.spaceline = " "*curses.COLS
 
         except curses.error as e:
-            self.window = None
+            self.curses = None
 
     def endwin(self):
-        if self.window:
+        if self.curses:
             curses.nocbreak()
             curses.echo()
             curses.endwin()

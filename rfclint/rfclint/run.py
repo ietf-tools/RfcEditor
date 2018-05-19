@@ -273,10 +273,14 @@ def main():
                 speller.no_curses = True
             speller.initscr()
             speller.processTree(xmlrfc.tree.getroot())
+            speller.sendCommand("#")  # save personal dictionary
             speller.endwin()
         except RfcLintError as e:
             log.error("Skipping spell checking because")
             log.error(e.message, additional=2)
+        except Exception as e:
+            speller.endwin()
+            raise e
 
     # do the Duplicate checking
     if not options.no_dups:
