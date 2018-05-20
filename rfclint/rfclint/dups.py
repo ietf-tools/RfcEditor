@@ -173,17 +173,17 @@ class Dups(object):
                     self.textLocation = line[2]
                 self.writeString(text[:match.start()+self.offset], partialString=True)
                 self.writeString(text[match.start()+self.offset:match.end()+self.offset],
-                                 curses.A_REVERSE, True)
+                                 self.A_REVERSE, True)
                 self.writeString(text[match.end()+self.offset:])
             else:
                 self.writeString(text)
             y += 1
 
         if self.curses:
-            self.curses.addstr(curses.LINES-15, 0, self.spaceline, curses.A_REVERSE)
-            self.curses.addstr(curses.LINES-13, 0, self.spaceline, curses.A_REVERSE)
+            self.curses.addstr(curses.LINES-15, 0, self.spaceline, self.A_REVERSE)
+            self.curses.addstr(curses.LINES-13, 0, self.spaceline, self.A_REVERSE)
 
-            self.curses.addstr(curses.LINES-2, 0, self.spaceline, curses.A_REVERSE)
+            self.curses.addstr(curses.LINES-2, 0, self.spaceline, self.A_REVERSE)
             self.curses.addstr(curses.LINES-1, 0, "?")
 
             self.curses.addstr(curses.LINES-11, 0, " ) Ignore")
@@ -273,11 +273,13 @@ class Dups(object):
         self.offset += len(replaceWord) - (match.end() - match.start())
         return textOut
 
-    def writeString(self, text, color=curses.A_NORMAL, partialString=False):
+    def writeString(self, text, color=0, partialString=False):
         newLine = False
         cols = 80
         if self.curses:
             cols = curses.COLS
+            if color == 0:
+                color = curses.A_NORMAL
         for line in text.splitlines(1):
             if line[:-1] == '\n':
                 newLine = True
@@ -311,12 +313,16 @@ class Dups(object):
 
     def initscr(self):
         try:
+            self.A_REVERSE = 0
+            self.A_NORMAL
             if haveCurses and not self.no_curses:
                 self.curses = curses.initscr()
                 curses.start_color()
                 curses.noecho()
                 curses.cbreak()
                 self.spaceline = " "*curses.COLS
+                self.A_REVERSE = curses.A_REVERSE
+                self.A_NORMAL = curses.A_NORMAL
 
         except curses.error as e:
             self.curses = None
