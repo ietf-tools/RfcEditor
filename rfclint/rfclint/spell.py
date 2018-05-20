@@ -300,7 +300,7 @@ class Speller(object):
         # self.word_re = re.compile(r'\w+', re.UNICODE | re.MULTILINE)
         self.aspell_re = re.compile(r".\s(\S+)\s(\d+)\s*((\d+): (.+))?", re.UNICODE)
 
-        self.spell_re = re.compile(r'\w[\w\']*\w', re.UNICODE)
+        self.spell_re = re.compile(r'\w[\w\'’]*\w', re.UNICODE)
 
         self.no_curses = False
         self.interactive = False
@@ -726,11 +726,13 @@ class Speller(object):
         self.offset += len(replaceWord) - (match.end() - match.start())
         return textOut
 
-    def writeString(self, text, color=curses.A_NORMAL, partialString=False):
+    def writeString(self, text, color=0, partialString=False):
         newLine = False
         cols = 80
         if self.curses:
             cols = curses.COLS
+            if color == 0:
+                color = curses.A_NORMAL
         for line in text.splitlines(1):
             if line[:-1] == '\n':
                 newLine = True
