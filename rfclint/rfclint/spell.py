@@ -8,7 +8,11 @@ import six
 import platform
 import codecs
 import subprocess
-import curses
+try:
+    import curses
+    haveCurses = True
+except ImportError:
+    haveCurses = False
 from rfctools_common import log
 
 
@@ -296,7 +300,6 @@ class Speller(object):
         # self.word_re = re.compile(r'\w+', re.UNICODE | re.MULTILINE)
         self.aspell_re = re.compile(r".\s(\S+)\s(\d+)\s*((\d+): (.+))?", re.UNICODE)
 
-        self.dupword_re = re.compile(r'\W*([\w\']+)\W*', re.UNICODE)
         self.spell_re = re.compile(r'\w[\w\']*\w', re.UNICODE)
 
         self.no_curses = False
@@ -333,7 +336,7 @@ class Speller(object):
 
     def checkWord(self, wordToCheck):
         #  Write word to check to the speller
-        
+
         newLine = u'^ ' + wordToCheck + u'\n'
         if self.iso8859:
             log.note(u"Pre Encode = " + newLine)
@@ -360,7 +363,7 @@ class Speller(object):
 
             #  Empty lines mean that we are done
             if len(line) == 0:
-                break;
+                break
 
             # '*' means ????
             if line[0] == '*':
@@ -380,7 +383,7 @@ class Speller(object):
             else:
                 log.error("internal error - aspell says line is '{0}'".format(line))
                 continue
-            
+
             tuple = (line[0], offset, None, m.group(1), options, 0)
             result.append(tuple)
 
@@ -396,7 +399,7 @@ class Speller(object):
             newLine = newLine  # .encode('utf-8')
             log.note(newLine)
         self.stdin.write(newLine)
-        
+
     def processLine(self, allWords):
         """
         Process each individual set of words and return the errors found
@@ -437,7 +440,6 @@ class Speller(object):
                 line = line.strip()
                 log.note('spell out line = ' + line)
 
-                
                 if len(line) == 0:
                     break
 
@@ -493,6 +495,9 @@ class Speller(object):
                     allWords.append(w.group(1))
                     if allWords[-1][-1] not in [' ', '-', "'"]:
                         allWords[-1] += ' '
+        if len(allWords) > 0:
+            allWords[0] = allWords[0].lstrip()
+            allWords[-1] = allWords[-1].rstrip()
 
         # do the spelling checking
         wordNo = -1
@@ -511,7 +516,8 @@ class Speller(object):
                                                                                     attributeName),
                                   where=words[1])
                     else:
-                        log.error(u"Misspelled word was found '{0}'".format(w.group(0)), where=words[1])
+                        log.error(u"Misspelled word was found '{0}'".format(w.group(0)),
+                                  where=words[1])
                     if self.window > 0:
                         if wordNo >= 0:
                             ctx = ""
@@ -519,7 +525,9 @@ class Speller(object):
                                 ctx = "".join(allWords[max(0, wordNo - self.window):wordNo])
                             ctx += self.color_start + allWords[wordNo] + self.color_end
                             if wordNo < len(allWords):
-                                ctx += "".join(allWords[wordNo + 1:min(wordNo + self.window + 1, len(allWords))])
+                                ctx += "".join(
+                                    allWords[wordNo + 1:
+                                             min(wordNo + self.window + 1, len(allWords))])
                             log.error(ctx, additional=2)
                     if self.suggest and sp[0][4]:
                         suggest = " ".join(sp[0][4].split()[0:10])
@@ -585,7 +593,7 @@ class Speller(object):
         else:
             log.write("")
             log.error(str1)
-        
+
         for line in wordSet:
             if isinstance(line[2], str):
                 text = line[1].attrib[line[2]]
@@ -616,7 +624,7 @@ class Speller(object):
             log.write("")
 
         for i in range(min(10, len(suggest))):
-            str1 = "{0}) {1}".format((i+1)%10, suggest[i].strip())
+            str1 = "{0}) {1}".format((i+1) % 10, suggest[i].strip())
             if self.curses:
                 self.curses.addstr(int(i/2) + curses.LINES-12, int(i % 2)*40, str1)
 
@@ -625,7 +633,7 @@ class Speller(object):
 
         if self.curses:
             self.curses.addstr(curses.LINES-6, 0, " ) Ignore")
-            self.curses.addstr(curses.LINES-6, 40, "A) Accept Word" )
+            self.curses.addstr(curses.LINES-6, 40, "A) Accept Word")
             self.curses.addstr(curses.LINES-5, 0, "I) Add to dictionary")
             self.curses.addstr(curses.LINES-5, 40, "U) Add to dictionary lowercase")
             self.curses.addstr(curses.LINES-4, 0, "D) Delete Word")
@@ -637,7 +645,7 @@ class Speller(object):
             self.curses.refresh()
         else:
             log.write("")
-            
+
         replaceWord = None
 
         while (True):
@@ -700,8 +708,8 @@ class Speller(object):
 
             if replaceWord is not None:
                 if isinstance(line[2], str):
-                    element.attrib[line[2]] = self.replaceText(element.attrib[line[2]], replaceWord, match,
-                                                               element)
+                    element.attrib[line[2]] = self.replaceText(element.attrib[line[2]],
+                                                               replaceWord, match, element)
                 elif words[2]:
                     element.text = self.replaceText(element.text, replaceWord, match, element)
                 else:
@@ -756,7 +764,7 @@ class Speller(object):
 
     def initscr(self):
         try:
-            if not self.no_curses:
+            if haveCurses and not self.no_curses:
                 self.curses = curses.initscr()
                 curses.start_color()
                 curses.noecho()

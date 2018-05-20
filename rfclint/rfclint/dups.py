@@ -7,7 +7,12 @@ import colorama
 import six
 import platform
 import codecs
-import curses
+try:
+    import curses
+    haveCurses = True
+except ImportError:
+    haveCurses = False
+
 from rfctools_common import log
 from rfclint.spell import RfcLintError, CheckAttributes, CutNodes
 
@@ -306,7 +311,7 @@ class Dups(object):
 
     def initscr(self):
         try:
-            if not self.no_curses:
+            if haveCurses and not self.no_curses:
                 self.curses = curses.initscr()
                 curses.start_color()
                 curses.noecho()
