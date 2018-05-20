@@ -314,7 +314,7 @@ class Dups(object):
     def initscr(self):
         try:
             self.A_REVERSE = 0
-            self.A_NORMAL
+            self.A_NORMAL = 0
             if haveCurses and not self.no_curses:
                 self.curses = curses.initscr()
                 curses.start_color()
