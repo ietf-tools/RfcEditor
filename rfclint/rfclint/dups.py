@@ -202,7 +202,8 @@ class Dups(object):
             if self.curses:
                 ch = chr(self.curses.getch())
             else:
-                ch = input("? ")[0]
+                ch = input("? ")
+                ch = (ch + "b")[0]
 
             if ch == ' ':
                 return
@@ -216,7 +217,8 @@ class Dups(object):
                     self.curses.refresh()
                     ch = self.curses.getch()
                 else:
-                    ch = input("Are you sure you want to abort? ")[0]
+                    ch = input("Are you sure you want to abort? ")
+                    ch = (ch + 'x')[0]
                 if ch == 'Y' or ch == 'y':
                     sys.exit(1)
 
