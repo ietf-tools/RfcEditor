@@ -608,7 +608,7 @@ class Speller(object):
                     self.textLocation = line[2]
                 self.writeString(text[:match.start()+self.offset], partialString=True)
                 self.writeString(text[match.start()+self.offset:match.end()+self.offset],
-                                 curses.A_REVERSE, True)
+                                 self.A_REVERSE, True)
                 self.writeString(text[match.end()+self.offset:])
             else:
                 self.writeString(text)
@@ -766,12 +766,16 @@ class Speller(object):
 
     def initscr(self):
         try:
+            self.A_REVERSE = 0
+            self.A_NORMAL = 0
             if haveCurses and not self.no_curses:
                 self.curses = curses.initscr()
                 curses.start_color()
                 curses.noecho()
                 curses.cbreak()
                 self.spaceline = " "*curses.COLS
+                self.A_REVERSE = curses.A_REVERSE
+                self.A_NORMAL = curses.A_NORMAL
 
         except curses.error as e:
             self.curses = None

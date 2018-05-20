@@ -280,7 +280,7 @@ def main():
             log.error(e.message, additional=2)
         except Exception as e:
             speller.endwin()
-            raise e
+            raise
 
     # do the Duplicate checking
     if not options.no_dups:
@@ -297,7 +297,7 @@ def main():
             log.error(e.message, additional=2)
         except Exception as e:
             dups.endwin()
-            raise e
+            raise
 
     if options.output_filename is not None:
         file = open(options.output_filename, 'w')
