@@ -351,6 +351,7 @@ class Test_Spell(unittest.TestCase):
                              "Tests/spell-utf8.xml"],
                       "Results/spell-utf8-dict.out", "Results/spell-utf8-dict.err", None, None)
 
+    @unittest.skipIf(os.name != 'nt', "Dictionaries are a problem")
     def test_spell_interact1(self):
         """ Interative spelling test #1 """
         try:
