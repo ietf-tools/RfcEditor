@@ -16,6 +16,9 @@ except ImportError:
 from rfctools_common import log
 from rfclint.spell import RfcLintError, CheckAttributes, CutNodes
 
+if six.PY2:
+    input = raw_input
+
 
 class Dups(object):
     """ Object to deal with processing duplicates """

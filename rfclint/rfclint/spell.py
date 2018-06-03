@@ -19,6 +19,7 @@ from rfctools_common import log
 if six.PY2:
     import subprocess32
     subprocess = subprocess32
+    input = raw_input
 else:
     import subprocess
 
@@ -300,7 +301,7 @@ class Speller(object):
         # self.word_re = re.compile(r'\w+', re.UNICODE | re.MULTILINE)
         self.aspell_re = re.compile(r".\s(\S+)\s(\d+)\s*((\d+): (.+))?", re.UNICODE)
 
-        self.spell_re = re.compile(r'\w[\w\'’]*\w', re.UNICODE)
+        self.spell_re = re.compile(r'\w[\w\'\u00B4\u2019]*\w', re.UNICODE)
 
         self.no_curses = False
         self.interactive = False
