@@ -499,6 +499,9 @@ def compare_file(errFile, stderr, displayError):
     else:
         with open(errFile, 'r', encoding='utf8') as f:
             lines2 = f.readlines()
+        if isinstance(stderr, str):
+            with open(stderr, 'rb') as f:
+                stderr = f.read()
         lines1 = stderr.decode('utf-8').splitlines(True)
 
     if os.name == 'nt':
