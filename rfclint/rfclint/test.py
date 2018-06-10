@@ -338,7 +338,7 @@ class Test_Spell(unittest.TestCase):
         if sys.platform.startswith('linux'):
             errFile = "Results/spell-utf8-linux.err"
         else:
-            errFile = "Results/spell-utf8.err"
+            errFile = ["Results/spell-utf8.err", "Results/spell-utf8-2.err"]
         check_process(self, [sys.executable, test_program, "--no-suggest", "--spell-window=0",
                              "--no-dup-detection", "--no-rng", "Tests/spell-utf8.xml"],
                       "Results/empty", errFile, None, None)
@@ -363,7 +363,7 @@ class Test_Spell(unittest.TestCase):
                              "--personal=Temp/en.pws", "-o", "Temp/Spell2.xml", "Tests/spell2.xml"],
                       "Results/Spell1.out", "Results/Spell1.err", "Temp/Spell2.xml",
                       "Results/Spell1.xml", input="Tests/Spell1.in")
-        self.assertTrue(compare_file("Temp/en.pws", "Results/en-1.pws", True),
+        self.assertTrue(compare_file2("Temp/en.pws", "Results/en-1.pws", True),
                         "Result word lists differ")
 
 
@@ -483,6 +483,14 @@ class Test_DupChecks(unittest.TestCase):
                       "Results/Dups2.xml", "Temp/dups.xml", input="Tests/Dups2.in")
 
 
+def compare_file2(errFile, stderr, displayError):
+    with open(stderr, 'rb') as f:
+        stderr = f.read()
+    if six.PY2:
+        lines1 = stderr.decode('utf-8')
+    return compare_file(errFile, lines1, displayError)
+
+
 def compare_file(errFile, stderr, displayError):
     if six.PY2:
         with open(errFile, 'r') as f:
@@ -491,9 +499,6 @@ def compare_file(errFile, stderr, displayError):
     else:
         with open(errFile, 'r', encoding='utf8') as f:
             lines2 = f.readlines()
-        if isinstance(stderr, str):
-            with open(stderr, 'rb') as f:
-                stderr = f.read()
         lines1 = stderr.decode('utf-8').splitlines(True)
 
     if os.name == 'nt':
