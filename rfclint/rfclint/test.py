@@ -336,7 +336,7 @@ class Test_Spell(unittest.TestCase):
     def test_spell_utf8(self):
         """ Need to do some testing of spelling w/ utf-8 characters """
         if sys.platform.startswith('linux'):
-            errFile = "Results/spell-utf8-linux.err"
+            errFile = ["Results/spell-utf8-linux.err", "Results/spell-utf8-2.err"]
         else:
             errFile = ["Results/spell-utf8.err", "Results/spell-utf8-2.err"]
         check_process(self, [sys.executable, test_program, "--no-suggest", "--spell-window=0",
