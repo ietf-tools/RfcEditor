@@ -488,6 +488,8 @@ def compare_file2(errFile, stderr, displayError):
         stderr = f.read()
     if six.PY2:
         lines1 = stderr.decode('utf-8')
+    else:
+        lines1 = stderr
     return compare_file(errFile, lines1, displayError)
 
 
