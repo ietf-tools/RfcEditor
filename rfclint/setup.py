@@ -36,7 +36,7 @@ import rfclint
 class PostInstallCommand(install):
     def run(self):
         # install.run(self)
-        install.do_egg_install()
+        install.do_egg_install(self)
         if os.name == "nt":
             return
         xx = self.which('bap')
