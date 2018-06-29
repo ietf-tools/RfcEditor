@@ -10,7 +10,7 @@ import os
 import lxml.etree
 import datetime
 import appdirs
-from rfctools_common.parser import XmlRfc, XmlRfcParser, XmlRfcError, CACHES
+from rfctools_common.parser import XmlRfc, XmlRfcParser, XmlRfcError, CACHES, CachingResolver
 from rfctools_common import log
 from rfclint.config import ConfigFile
 from rfclint.abnf import AbnfChecker, RfcLintError
@@ -244,10 +244,17 @@ def main():
     if len(codeItems) > 0:
         log.note("Validating XML fragments in sourcecode elements")
         parser = lxml.etree.XMLParser(dtd_validation=False, load_dtd=False, no_network=True,
-                                      resolve_entities=False)
+                                      resolve_entities=False, recover=True)
+        # resolver without knowledge of rfc_number:
+        caching_resolver = CachingResolver(no_network=True,
+                                           verbose=options.verbose,
+                                           quiet=options.quiet
+        )
+        parser.resolvers.add(caching_resolver)
+
         for item in codeItems:
             try:
-                lxml.etree.parse(item.text, parser)
+                lxml.etree.fromstring(item.text, parser)
             except (lxml.etree.XMLSyntaxError) as e:
                 log.warn('XML in sourcecode not well formed', e.msg, where=item)
             except Exception as e:
@@ -300,7 +307,7 @@ def main():
             raise
 
     if options.output_filename is not None:
-        file = open(options.output_filename, 'w')
+        file = open(options.output_filename, 'wb')
         file.write(lxml.etree.tostring(xmlrfc.tree.getroot(),
                                        xml_declaration=True,
                                        encoding='utf-8',

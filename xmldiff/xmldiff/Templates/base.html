@@ -166,6 +166,18 @@ function XXX()
       document.getElementById("defaultOpen").click();
       document.getElementById("defaultOpenR").click();
 
+      $$(window).load(function() {
+      var cssRules = {
+        'propertyGroups' : {
+          'inline' : ['color']
+        },
+        'elementGroups' : {
+          'inline' : ['SPAN']
+        }
+      }
+      $$('#centerColumn').inlineStyler(cssRules);
+      });
+
     </script>
 
 </body>
