@@ -36,7 +36,7 @@ install:
 
 script:
   - $PIP install -r requirements.txt
-  - export PATH=$PATH;${HOME}/travis/bild/Com-AugusetCellars/RfcEditor/$BAP
+  - export PATH=$PATH;${HOME}/travis/build/Com-AugustCellars/RfcEditor/$BAP
   - pwd
   - mkdir dist
   - python --version
