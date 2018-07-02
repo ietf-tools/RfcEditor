@@ -261,7 +261,7 @@ def main():
             except (lxml.etree.XMLSyntaxError) as e:
                 log.warn(u'XML in sourcecode not well formed: ', e.msg, where=item)
             except Exception as e:
-                log.warn(u'Error occured processing XML: ', e, where=item)
+                log.exception(u'Error occured processing XML: ', e)
     else:
         log.note("No XML fragments in sourcecode elements found.")
 
