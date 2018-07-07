@@ -14,6 +14,7 @@ try:
 except ImportError:
     haveCurses = False
 from rfctools_common import log
+from rfclint import CursesCommon
 
 
 if six.PY2:
@@ -142,9 +143,10 @@ def which(program):
     return None
 
 
-class Speller(object):
+class Speller(CursesCommon):
     """ Object to deal with processing spelling and duplicates """
     def __init__(self, config):
+        CursesCommon.__init(self, config)
         program = config.get('spell', 'program')
         self.suggest = config.getBoolean('spell', 'suggest', True)
         self.window = config.getInt('spell', 'window', 15)
@@ -303,11 +305,7 @@ class Speller(object):
 
         self.spell_re = re.compile(r'\w[\w\'\u00B4\u2019]*\w', re.UNICODE)
 
-        self.no_curses = False
-        self.interactive = False
-        self.curses = None
         if config.options.output_filename is not None:
-            self.interactive = True
             self.ignoreWords = []
             self.lastElement = None
             self.textLocation = True
@@ -765,25 +763,3 @@ class Speller(object):
                 newLine = False
             if self.x != 0 and line[-1] != ' ' and not partialString:
                 self.x += 1
-
-    def initscr(self):
-        try:
-            self.A_REVERSE = 0
-            self.A_NORMAL = 0
-            if haveCurses and not self.no_curses:
-                self.curses = curses.initscr()
-                curses.start_color()
-                curses.noecho()
-                curses.cbreak()
-                self.spaceline = " "*curses.COLS
-                self.A_REVERSE = curses.A_REVERSE
-                self.A_NORMAL = curses.A_NORMAL
-
-        except curses.error as e:
-            self.curses = None
-
-    def endwin(self):
-        if self.curses:
-            curses.nocbreak()
-            curses.echo()
-            curses.endwin()
