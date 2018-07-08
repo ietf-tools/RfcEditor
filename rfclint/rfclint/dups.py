@@ -13,7 +13,7 @@ try:
 except ImportError:
     haveCurses = False
 
-from rfclint import CursesCommon
+from rfclint.CursesCommon import CursesCommon
 from rfctools_common import log
 from rfclint.spell import RfcLintError, CheckAttributes, CutNodes
 
@@ -24,13 +24,12 @@ if six.PY2:
 class Dups(CursesCommon):
     """ Object to deal with processing duplicates """
     def __init__(self, config):
-        CursesCommon.__init(self, config)
+        CursesCommon.__init__(self, config)
         self.word_re = re.compile(r'(\W*\w+\W*)', re.UNICODE | re.MULTILINE)
         # self.word_re = re.compile(r'\w+', re.UNICODE | re.MULTILINE)
         self.aspell_re = re.compile(r".\s(\S+)\s(\d+)\s*((\d+): (.+))?", re.UNICODE)
 
         self.dupword_re = re.compile(r'\W*([\w\']+)\W*', re.UNICODE)
-
 
         self.dup_re = re.compile(r' *\w[\w\']*\w|\w', re.UNICODE)
 
@@ -161,6 +160,7 @@ class Dups(CursesCommon):
                 log.error(u"{1}:{2} Duplicate word found '{0}'".
                           format(match.group(0), fileName, element.sourceline))
 
+        self.writeStringInit()
         for line in wordSet:
             if isinstance(line[2], str):
                 text = line[1].attrib[line[2]]
@@ -180,6 +180,7 @@ class Dups(CursesCommon):
             else:
                 self.writeString(text)
             y += 1
+        self.writeStringEnd()
 
         if self.curses:
             self.curses.addstr(curses.LINES-15, 0, self.spaceline, self.A_REVERSE)
@@ -196,8 +197,6 @@ class Dups(CursesCommon):
 
             self.curses.addstr(curses.LINES-1, 0, "?")
             self.curses.refresh()
-        else:
-            log.write("")
 
         while (True):
             # ch = get_character()
@@ -218,6 +217,7 @@ class Dups(CursesCommon):
                     self.curses.addstr(curses.LINES-1, 0, "Are you sure you want to abort?")
                     self.curses.refresh()
                     ch = self.curses.getch()
+                    ch = chr(ch)
                 else:
                     ch = input("Are you sure you want to abort? ")
                     ch = (ch + 'x')[0]
@@ -237,8 +237,22 @@ class Dups(CursesCommon):
                 else:
                     element.tail = self.removeText(element.tail, match, element)
                 return
-            elif ch == 'X':
-                return
+            elif ch == 'X' or ch == 'x':
+                if self.curses:
+                    self.curses.addstr(curses.LINES-1, 0,
+                                       "Are you sure you want to exit spell checking?")
+                    self.curses.refresh()
+                    ch = self.curses.getch()
+                    ch = chr(ch)
+                else:
+                    ch = input("Are you sure you want to exit spell checking? ")
+                    ch = (ch + 'x')[0]
+
+                if ch == 'Y' or ch == 'y':
+                    raise RfcLintError("Exit Requested")
+                if self.curses:
+                    self.curses.addstr(curses.LINES-1, 0, "?" + ' '*30)
+                    self.curses.refresh()
             elif ch == 'R':
                 if self.curses:
                     self.curses.addstr(curses.LINES-1, 0, "Replace with: ")
@@ -277,4 +291,3 @@ class Dups(CursesCommon):
             textIn[match.end()+self.offset:]
         self.offset += len(replaceWord) - (match.end() - match.start())
         return textOut
-
