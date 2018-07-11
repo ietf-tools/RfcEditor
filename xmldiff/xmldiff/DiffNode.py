@@ -5,6 +5,7 @@ import math
 import sys
 import difflib
 import six
+import re
 from lxml.html import builder as E
 from xmldiff.EditItem import EditItem
 # from xmldiff.zzs import EditItem
@@ -397,32 +398,42 @@ class DiffRoot(object):
             self.fixPreserveSpace(n, rightText)
             node.append(n)
         else:
-            differ = difflib.SequenceMatcher(None, leftText, rightText)
-            for tag, i1, i2, j1, j2 in differ.get_opcodes():
-                if tag == 'equal':
+            leftArray = self.doWhiteArray(leftText)
+            rightArray = self.doWhiteArray(rightText)
+            d = difflib.Differ()
+            result = list(d.compare(leftArray, rightArray))
+
+            for d in result:
+                tag = d[0:2]
+                if tag == '  ':
                     n = E.SPAN()
-                    self.fixPreserveSpace(n, leftText[i1:i2])
+                    self.fixPreserveSpace(n, d[2:])
                     node.append(n)
-                elif tag == 'delete':
+                elif tag == '- ':
                     n = E.SPAN()
                     n.attrib['class'] = 'left'
-                    self.fixPreserveSpace(n, leftText[i1:i2])
+                    self.fixPreserveSpace(n, d[2:])
                     node.append(n)
-                elif tag == 'insert':
+                elif tag == '+ ':
                     n = E.SPAN()
                     n.attrib['class'] = 'right'
-                    self.fixPreserveSpace(n, rightText[j1:j2])
+                    self.fixPreserveSpace(n, d[2:])
                     node.append(n)
+                elif tag == '? ':
+                    pass
                 else:
                     n = E.SPAN()
-                    n.attrib['class'] = 'left'
-                    self.fixPreserveSpace(n, leftText[i1:i2])
-                    node.append(n)
-                    n = E.SPAN()
-                    n.attrib['class'] = 'right'
-                    self.fixPreserveSpace(n, rightText[j1:j2])
+                    n.attrib['class'] = 'error'
+                    self.fixPreserveSpace(n, d[2:])
                     node.append(n)
 
+    def doWhiteArray(self, text):
+        result = []
+        #  At some point I want to split whitespace with
+        #  CR in them to multiple lines
+        for right in re.split('(\s+)', text):
+            result.append(right)
+        return result
 
 class DiffDocument(DiffRoot):
     """ Represent the XML document.  We want to have a common
