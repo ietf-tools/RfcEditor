@@ -93,13 +93,13 @@ function OnScrollCenter()
 {
     el2 = XXX()
                     
-    if (el2.context.hasAttribute('whereLeft')) {
-        document.getElementById(el2.context.getAttribute('whereLeft')).scrollIntoView()
+    if (el2.attr('whereLeft') != undefined) {
+        document.getElementById(el2.attr('whereLeft')).scrollIntoView()
     }                
-    if (el2.context.hasAttribute('whereRight')) {
-        document.getElementById(el2.context.getAttribute('whereRight')).scrollIntoView()
+    if (el2.attr('whereRight') != undefined) {
+        document.getElementById(el2.attr('whereRight')).scrollIntoView()
     }                
-    console.log("---> " + el2.context.getAttribute('whereLeft') + " -- " + el2.context.getAttribute('whereRight'));
+    console.log("---> " + el2.attr('whereLeft') + " -- " + el2.attr('whereRight'));
 }
 
 function XXX()
@@ -190,7 +190,7 @@ function XXX()
       document.getElementById("defaultOpen").click();
       document.getElementById("defaultOpenR").click();
 
-      $(window).load(function() {
+      window.onload =function() {
       var cssRules = {
         'propertyGroups' : {
           'inline' : ['color']
@@ -200,7 +200,7 @@ function XXX()
         }
       }
       $('#centerColumn').inlineStyler(cssRules);
-      });
+      };
 
     </script>
 

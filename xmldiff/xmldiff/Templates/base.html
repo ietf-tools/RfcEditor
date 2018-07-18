@@ -115,17 +115,6 @@ function XXX()
     }
     return null;
 }
-
-function hidePanel(which)
-{
-                      var xxx = docment.getElementById(which);
-                      if (xxx.style.visibilty == "hidden") {
-                         xxx.style.visibility = "visible"
-                      }
-                      else {
-                         xxx.style.visibility = "hidden";
-                      }
-                      }
 </script>
 </head>
 
@@ -149,7 +138,6 @@ function hidePanel(which)
 	    <button type="button" onclick="expandTree('diffRoot')">Expand All</button>
 	    <button type="button" onclick="collapseTree('diffRoot')">Collapse All</button>
 	    <button type="button" onclick="expandDiffs('diffRoot')">Expand Diffs</button>
-            <!-- <button type="button" onclick="hidePanel('leftColumn')">Hide Left Tree</button> -->
 	  </div>
 	  <div id="centerColumn" onscroll="OnScrollCenter()">
 	    $body

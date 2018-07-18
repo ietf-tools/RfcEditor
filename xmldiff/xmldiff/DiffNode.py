@@ -237,7 +237,7 @@ class DiffRoot(object):
         item = EditItem()
         item.setOperation(EditItem.OP_INSERT, None, left)
         if isinstance(left, DiffElement) or isinstance(left, DiffComment) or \
-            isinstance(left, DiffText) or isinstance(left, DiffParagraph):
+           isinstance(left, DiffText) or isinstance(left, DiffParagraph):
             item.cost = 10
         else:
             item.cost = 1
@@ -257,7 +257,7 @@ class DiffRoot(object):
             is the preferred operation
         """
         if isinstance(self, DiffElement) or isinstance(self, DiffComment) or \
-            isinstance(self, DiffText) or isinstance(self, DiffParagraph):
+           isinstance(self, DiffText) or isinstance(self, DiffParagraph):
             cost = 10
         else:
             cost = 1
@@ -465,7 +465,6 @@ class DiffRoot(object):
                     n.attrib['class'] = 'error'
                     self.fixPreserveNL(n, ''.join(leftArray[i1:i2])+"*"+''.join(rightArray[j1:j2]))
                     node.append(n)
-
 
     def doWhiteArray(self, text):
         result = []
@@ -797,7 +796,7 @@ class DiffComment(DiffRoot):
         else:
             node.attrib["whereLeft"] = "L{0}_{1}".format(self.xml.sourceline, 0)
             node.attrib["whereRight"] = "R{0}_{1}".format(self.matchNode.xml.sourceline, 0)
-            left = self.myLine
+            left = myLine
             right = "<-- " + self.matchNode.xml.text.replace(' ', nbsp) + "-->"
             self.diffTextToHtml(left, right, node)
 
