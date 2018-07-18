@@ -38,7 +38,6 @@
 
   <script src="https://www.w3schools.com/lib/w3.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 
     <script src="$resource_dir/colresize.js"></script>
@@ -93,13 +92,13 @@ function OnScrollCenter()
 {
     el2 = XXX()
                     
-    if (el2.context.hasAttribute('whereLeft')) {
-        document.getElementById(el2.context.getAttribute('whereLeft')).scrollIntoView()
+    if (el2.attr('whereLeft') != undefined) {
+        document.getElementById(el2.attr('whereLeft')).scrollIntoView()
     }                
-    if (el2.context.hasAttribute('whereRight')) {
-        document.getElementById(el2.context.getAttribute('whereRight')).scrollIntoView()
+    if (el2.attr('whereRight') != undefined) {
+        document.getElementById(el2.attr('whereRight')).scrollIntoView()
     }                
-    console.log("---> " + el2.context.getAttribute('whereLeft') + " -- " + el2.context.getAttribute('whereRight'));
+    console.log("---> " + el2.attr('whereLeft') + " -- " + el2.attr('whereRight'));
 }
 
 function XXX()
@@ -116,6 +115,17 @@ function XXX()
     }
     return null;
 }
+
+function hidePanel(which)
+{
+                      var xxx = docment.getElementById(which);
+                      if (xxx.style.visibilty == "hidden") {
+                         xxx.style.visibility = "visible"
+                      }
+                      else {
+                         xxx.style.visibility = "hidden";
+                      }
+                      }
 </script>
 </head>
 
@@ -139,6 +149,7 @@ function XXX()
 	    <button type="button" onclick="expandTree('diffRoot')">Expand All</button>
 	    <button type="button" onclick="collapseTree('diffRoot')">Collapse All</button>
 	    <button type="button" onclick="expandDiffs('diffRoot')">Expand Diffs</button>
+            <!-- <button type="button" onclick="hidePanel('leftColumn')">Hide Left Tree</button> -->
 	  </div>
 	  <div id="centerColumn" onscroll="OnScrollCenter()">
 	    $body
@@ -170,7 +181,7 @@ function XXX()
       document.getElementById("defaultOpen").click();
       document.getElementById("defaultOpenR").click();
 
-      $$(window).load(function() {
+      window.onload = function() {
       var cssRules = {
         'propertyGroups' : {
           'inline' : ['color']
@@ -180,7 +191,7 @@ function XXX()
         }
       }
       $$('#centerColumn').inlineStyler(cssRules);
-      });
+      };
 
     </script>
 
