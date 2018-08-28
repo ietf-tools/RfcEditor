@@ -402,7 +402,7 @@ if __name__ == '__main__':
         if os.name == 'nt':
             xmldiff_program += '.exe'
         xmldiff_program = which(xmldiff_program)
-        if xmldiff_program is None:
+        if xmldiff_program is None and os.name == 'nt':
             print("Failed to find the rfc-xmldiff for testing")
             xmldiff_program = "../xmldiff/run.py"
 
