@@ -8,7 +8,7 @@ import six
 import sys
 from rfctools_common.parser import XmlRfc, XmlRfcParser, XmlRfcError, CACHES
 from rfctools_common import log
-from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, AddParagraphs, tagMatching
+from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, AddParagraphs, tagMatching, SourceFileNames
 import string
 from xmldiff.EditItem import EditItem
 from xmldiff.zzs2 import distance
@@ -122,7 +122,9 @@ def main():
                           resolve_entities=not options.noEntity)
     try:
         ll = parser.parse(remove_pis=False, strip_cdata=False, remove_comments=False).tree
+        SourceFileNames = [leftSource]
         leftXml = BuildDiffTree(ll, options)
+        leftSourceNames = SourceFileNames
         if not options.raw:
             leftXml = AddParagraphs(leftXml)
         leftFile_base = os.path.basename(leftSource)
@@ -139,7 +141,9 @@ def main():
                           resolve_entities=not options.noEntity)
     try:
         rightXml = parser.parse(remove_pis=False, strip_cdata=False, remove_comments=False)
+        SourceFileNames = [rightSource]
         rightXml = BuildDiffTree(rightXml.tree, options)
+        rightSourceNames = SourceFileNames
         if not options.raw:
             rightXml = AddParagraphs(rightXml)
         rightFile_base = os.path.basename(rightSource)
