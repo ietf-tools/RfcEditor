@@ -42,7 +42,9 @@ class Dups(CursesCommon):
         if tree.tag in CheckAttributes:
             self.checkAttributes(tree)
         if tree.tag in CutNodes:
-            self.checkTree(tree)
+            if not ((tree.tag == 'sourcecode' and self.skipCode) or
+                    (tree.tag == 'artwork' and self.skipArtwork)):
+                self.checkTree(tree)
         for node in tree.iterchildren():
             self.processTree(node)
 

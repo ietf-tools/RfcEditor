@@ -71,6 +71,8 @@ def main():
                               help='Specify an alternate RNG file')
     parser_options.add_option('-X', '--no-xinclude', action='store_true', dest='no_xinclude',
                               help='don\'t resolve any xi:include elements')
+    parser_options.add_option('--no-xml', dest='no_xml', action='store_true',
+                              help='Don\'t perform XML well-formness checking')
 
     optionparser.add_option_group(parser_options)
 
@@ -116,6 +118,11 @@ def main():
                              help='color incorrect words in supplied context')
     spell_options.add_option('--no-curses', dest='no_curses', action='store_true',
                              help='disable curses when doing spell checking and dup detection')
+    spell_options.add_option('--skip-code', dest='skip_code', action='store_true',
+                             help='skip all code elements when doing spell and duplicate checking')
+    spell_options.add_option('--skip-artwork', dest='skip_artwork', action='store_true',
+                             help='skip all artwork elements when doing spell and '
+                             'duplicate checking')
     optionparser.add_option_group(spell_options)
 
     abnf_options = optparse.OptionGroup(optionparser, 'ABNF Options')
@@ -241,29 +248,31 @@ def main():
 
     #  Validate any embedded XML
 
-    codeItems = xmlrfc.tree.getroot().xpath("//sourcecode[@type='xml']")
-    if len(codeItems) > 0:
-        log.note("Validating XML fragments in sourcecode elements")
-        # resolver without knowledge of rfc_number:
-        caching_resolver = CachingResolver(no_network=True,
-                                           verbose=options.verbose,
-                                           quiet=options.quiet)
+    if not options.no_xml:
+        codeItems = xmlrfc.tree.getroot().xpath("//sourcecode[@type='xml']")
+        if len(codeItems) > 0:
+            log.note("Validating XML fragments in sourcecode elements")
+            # resolver without knowledge of rfc_number:
+            caching_resolver = CachingResolver(no_network=True,
+                                               verbose=options.verbose,
+                                               quiet=options.quiet)
 
-        for item in codeItems:
-            parser = lxml.etree.XMLParser(dtd_validation=False, load_dtd=False, no_network=True,
-                                          resolve_entities=False, recover=False)
-            parser.resolvers.add(caching_resolver)
-            try:
-                file = six.BytesIO(item.text.encode('utf-8'))
+            for item in codeItems:
+                parser = lxml.etree.XMLParser(dtd_validation=False, load_dtd=False, no_network=True,
+                                              resolve_entities=False, recover=False)
+                parser.resolvers.add(caching_resolver)
+                try:
+                    file = six.BytesIO(item.text.encode('utf-8'))
 
-                bbb = lxml.etree.parse(file, parser)
-                aaa = bbb
-            except (lxml.etree.XMLSyntaxError) as e:
-                log.warn(u'XML in sourcecode not well formed: ', e.msg, where=item)
-            except Exception as e:
-                log.exception(u'Error occured processing XML: ', e)
-    else:
-        log.note("No XML fragments in sourcecode elements found.")
+                    bbb = lxml.etree.parse(file, parser)
+                    aaa = bbb
+                    log.warn("XML fragment in source code found and is well defined.", where=item)
+                except (lxml.etree.XMLSyntaxError) as e:
+                    log.warn(u'XML in sourcecode not well formed: ', e.msg, where=item)
+                except Exception as e:
+                    log.exception(u'Error occured processing XML: ', e)
+        else:
+            log.warn("No XML fragments in sourcecode elements found.")
 
     #  Validate any embedded ABNF
     if not options.no_abnf:
