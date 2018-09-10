@@ -6,7 +6,6 @@ import lxml.etree
 import datetime
 import six
 import sys
-from urllib.parse import urlparse
 from rfctools_common.parser import XmlRfc, XmlRfcParser, XmlRfcError, CACHES
 from rfctools_common import log
 from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, AddParagraphs, tagMatching
@@ -16,6 +15,11 @@ from xmldiff.EditItem import EditItem
 from xmldiff.zzs2 import distance
 # from xmldiff.zzs import distance, EditItem
 from xmldiff.__init__ import __version__
+
+if six.PY2:
+    from urllib import urlparse
+else:
+    from urllib.parse import urlparse
 
 try:
     import debug
