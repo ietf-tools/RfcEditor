@@ -376,6 +376,11 @@ def check_process(tester, args, stdoutFile, errFile, generatedFile, compareFile)
             lines1 = f.readlines()
         lines1 = [line.replace('$TDIR', template_dir) for line in lines1]
 
+        cwd = os.getcwd()
+        if os.name == 'nt':
+            cwd = cwd.replace('\\', '/')
+        lines1 = [line.replace('$$CWD$$', cwd) for line in lines1]
+
         d = difflib.Differ()
         result = list(d.compare(lines1, lines2))
 
