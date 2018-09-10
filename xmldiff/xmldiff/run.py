@@ -17,7 +17,7 @@ from xmldiff.zzs2 import distance
 from xmldiff.__init__ import __version__
 
 if six.PY2:
-    from urllib import urlparse
+    from urlparse import urlparse
 else:
     from urllib.parse import urlparse
 
@@ -174,7 +174,7 @@ def main():
         if six.PY2:
             with open(file, "rb") as f:
                 leftLines = f.read()
-                leftLines = leftLines.decode('utf8').splitlines()
+                leftLines = leftLines.decode('utf8').splitlines(1)
         else:
             with open(file, "rU", encoding="utf8") as f:
                 leftLines = f.readlines()
@@ -199,7 +199,7 @@ def main():
 
         if six.PY2:
             with open(file, "rb") as f:
-                rightLines = f.read().decode('utf8').splitlines()
+                rightLines = f.read().decode('utf8').splitlines(1)
         else:
             with open(file, "rU", encoding="utf8") as f:
                 rightLines = f.readlines()
