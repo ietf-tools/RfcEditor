@@ -6,6 +6,7 @@ except ImportError:
 
 import codecs
 import six
+import re
 from rfctools_common import log
 
 
@@ -79,6 +80,15 @@ class CursesCommon(object):
                 color = curses.A_NORMAL
         saveX = self.x
         saveY = self.y
+
+        if self.y == 0 and self.x == 0:
+            text = text.lstrip()
+        text = re.sub(r'\s*\n\s*', ' ',
+                      re.sub(r'\.\s*\n\s*', '.  ',
+                             text))
+        # if len(text) > 0 and text[-1] != ' ':
+        #     text += ' '
+
         if six.PY2:
             text = text.encode('ascii', 'replaceWithONE')
         for line in text.splitlines(1):

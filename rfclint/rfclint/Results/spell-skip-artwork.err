@@ -48,10 +48,6 @@ Tests/spell.xml:60: Misspelled word was found 'THis'
   THis is the sectn name.
 Tests/spell.xml:60: Misspelled word was found 'sectn'
   THis is the sectn name.
-Tests/spell.xml:61: Misspelled word was found 'txt'
-  Artwork can contain a txt element or an svg element
-Tests/spell.xml:61: Misspelled word was found 'svg'
-  Artwork can contain a txt element or an svg element
 Tests/spell.xml:65: Misspelled word was found 'Assides'
   Assides do not allow for text content directly in them.
 Tests/spell.xml:67: Misspelled word was found 'allwos'
@@ -64,18 +60,10 @@ Tests/spell.xml:74: Misspelled word was found 'Whch'
   Whch allows for two items
 Tests/spell.xml:78: Misspelled word was found 'figre'
   Title of the figre
-Tests/spell.xml:81: Misspelled word was found 'Cn'
-  Cn be text item
-Tests/spell.xml:82: Misspelled word was found 'Src'
-  Src Is additonlly text = could pt to something
-Tests/spell.xml:82: Misspelled word was found 'additonlly'
-  Src Is additonlly text = could pt to something
 Tests/spell.xml:87: Misspelled word was found 'THis'
   THis can bee a text item
 Tests/spell.xml:89: Misspelled word was found 'tiem'
   Or this can be a structured text tiem
-Tests/spell.xml:92: Misspelled word was found 'permmts'
-  Only permmts text
 Tests/spell.xml:95: Misspelled word was found 'aa'
   This is aa table
 Tests/spell.xml:98: Misspelled word was found 'THis'

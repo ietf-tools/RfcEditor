@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import sys
 
-
+import re
 import optparse
 import os
 import lxml.etree
@@ -193,9 +193,11 @@ def main():
     # Parse the document into an xmlrfc tree instance
     log.note("Checking for well-formness of '{0}'".format(source))
     parser = XmlRfcParser(source, verbose=options.verbose,
+                          preserve_all_white=True,
                           quiet=True,
                           cache_path=options.cache,
                           no_network=options.no_network,
+                          no_xinclude=options.no_xinclude,
                           templates_path=globals().get('_TEMPLATESPATH', None))
     try:
         xmlrfc = parser.parse(remove_comments=False,
@@ -239,8 +241,14 @@ def main():
         else:
             file = sys.stdout
 
+        needEOL = True
         for item in codeItems:
             file.write(item.text)
+            if len(item.text) > 0:
+                needEOL = item.text[-1] != '\n'
+
+        if needEOL:
+            file.write('\n')
 
         if options.output_filename:
             file.close()
@@ -262,7 +270,8 @@ def main():
                                               resolve_entities=False, recover=False)
                 parser.resolvers.add(caching_resolver)
                 try:
-                    file = six.BytesIO(item.text.encode('utf-8'))
+                    text = re.sub(u'^\s+<\?xml ', '<?xml ', item.text)
+                    file = six.BytesIO(text.encode('utf-8'))
 
                     bbb = lxml.etree.parse(file, parser)
                     aaa = bbb
@@ -330,11 +339,12 @@ def main():
         text = lxml.etree.tostring(xmlrfc.tree.getroot(),
                                    xml_declaration=True,
                                    encoding='utf-8',
-                                   doctype=xmlrfc.tree.docinfo.doctype,
-                                   pretty_print=True)
+                                   doctype=xmlrfc.tree.docinfo.doctype)
         if six.PY3:
             text = text.decode('utf8')
         file.write(text)
+        if len(text) > 0 and text[-1] != '\n':
+            file.write('\n')
 
 
 if __name__ == '__main__':
