@@ -459,7 +459,7 @@ class XmlRfcParser:
                      'http://xml2rfc.tools.ietf.org/public/rfc/',
                  ],
                  resolve_entities=True,
-                 preserve_all_white=True
+                 preserve_all_white=False
                  ):
         self.verbose = verbose
         self.quiet = quiet
