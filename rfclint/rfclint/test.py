@@ -387,7 +387,7 @@ class Test_Spell(unittest.TestCase):
     def test_skip_artwork(self):
         """ Do basic quiet spell checking """
         check_process(self, [sys.executable, test_program, "--no-suggest", "--no-dup-detection",
-                             "--no-abnf", "--no-xml",
+                             "--no-abnf", "--no-xml", "--color=none",
                              "--skip-artwork", "--skip-code", "Tests/spell.xml"],
                       "Results/empty", "Results/spell-skip-artwork.err", None, None)
 
