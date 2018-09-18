@@ -114,7 +114,7 @@ class SourceExtracter(object):
                 file.write(item.text)
             lineCount = item.text.count('\n') + 1
             if len(item.text) > 0 and item.text[-1] != '\n':
-                file.write('\n')
+                file.write(u'\n')
                 lineCount += 1
             lineOffsets.append((item.base, item.sourceline, lineCount))
 
