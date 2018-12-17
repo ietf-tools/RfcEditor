@@ -50,7 +50,7 @@ test_script:
   - "%PYTHON%\\%EXECUTABLE% test.py"
   - cd ..\..
   - ps: |
-       if ($env:PYTHON.IndexOf("x64")
+       if ($env:PYTHON.IndexOf("x64"))
        {
          cd xmldiff
          "%PYTHON%\\%EXECUTABLE% setup.py --quiet install"
