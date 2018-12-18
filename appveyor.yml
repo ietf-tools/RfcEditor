@@ -52,7 +52,7 @@ test_script:
   - ps: |
         if ($env:PYTHON.IndexOf("x64") -ge 0)
         {
-           c:\Projects\RfcEditor\winbuild\xmldiff.cmd
+           winbuild\xmldiff.cmd
         }
   
 # after_test:
