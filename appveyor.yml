@@ -49,15 +49,15 @@ test_script:
   - cd rfclint
   - "%PYTHON%\\%EXECUTABLE% test.py"
   - cd ..\..
-  - ps: |
-        if ($env:PYTHON.IndexOf("x64") -ge 0)
-        {
-           winbuild\xmldiff.cmd
-        }
+  - cd xmldiff
+  - "%PYTHON%\\%EXECUTABLE% setup.py --quiet install"
+  - cd Test
+  - "%PYTHON%\\%EXECUTABLE% test.py"
+  - cd ..\..
   
-# after_test:
-#   - cd ..
-#   - "%PYTHON%\\%EXECUTABLE% setup.py bdist_wheel"
+after_test:
+  - cd ..
+  - "%PYTHON%\\%EXECUTABLE% setup.py bdist_wheel"
 
 artifacts:
   - path: xmldiff\dist\*
