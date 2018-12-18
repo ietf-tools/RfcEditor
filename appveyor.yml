@@ -58,9 +58,9 @@ test_script:
            "%PYTHON%\\%EXECUTABLE% test.py"
         }
   
-after_test:
-  - cd ..
-  - "%PYTHON%\\%EXECUTABLE% setup.py bdist_wheel"
+# after_test:
+#   - cd ..
+#   - "%PYTHON%\\%EXECUTABLE% setup.py bdist_wheel"
 
 artifacts:
   - path: xmldiff\dist\*
