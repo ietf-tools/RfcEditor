@@ -53,7 +53,6 @@ test_script:
   - "%PYTHON%\\%EXECUTABLE% setup.py --quiet install"
   - cd Test
   - "%PYTHON%\\%EXECUTABLE% test.py"
-  - cd ..\..
   
 after_test:
   - cd ..
