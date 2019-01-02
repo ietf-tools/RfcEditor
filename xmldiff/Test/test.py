@@ -100,7 +100,7 @@ class TestParserMethods(unittest.TestCase):
                          "Found code style errors (and warnings).")
 
     def test_pyflakes_confrmance(self):
-        p = subprocess.Popen(['pyflakes.exe', '../xmldiff/run.py', '../xmldiff/zzs2.py',
+        p = subprocess.Popen(['pyflakes', '../xmldiff/run.py', '../xmldiff/zzs2.py',
                                         '../xmldiff/EditDistance.py', '../xmldiff/EditItem.py',
                                         '../xmldiff/DiffNode.py', 'test.py'],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
