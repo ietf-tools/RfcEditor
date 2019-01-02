@@ -1,11 +1,9 @@
 import io
 import re
 import os
-import errno
 import sys
 import colorama
 import six
-import platform
 import codecs
 import subprocess
 try:
@@ -31,7 +29,6 @@ if os.name == 'nt':
         return msvcrt.getch()
 else:
     import tty
-    import sys
     import termios
 
     def get_character():
@@ -435,8 +432,6 @@ class Speller(CursesCommon):
             log.note(newLine)
             self.stdin.write(newLine)
 
-            index = 0
-            running = 0
             while True:
                 line = self.stdout.readline()
                 if six.PY2:

@@ -3,19 +3,10 @@ import platform
 import unittest
 import os
 import shutil
-import io
 import sys
 import subprocess
 import difflib
 import six
-from rfclint.spell import Speller
-from rfclint.config import ConfigFile
-from lxml import etree
-
-try:
-    from configparser import SafeConfigParser, NoSectionError
-except ImportError:
-    from ConfigParser import SafeConfigParser, NoSectionError
 
 test_program = "rfclint"
 
@@ -47,7 +38,7 @@ class Test_Coding(unittest.TestCase):
 
     def test_pyflakes_confrmance(self):
         p = subprocess.Popen(['pyflakes', 'run.py', 'abnf.py', 'config.py', 'spell.py',
-                                        'test.py', 'dups.py', 'CursesCommon.py'],
+                              'test.py', 'dups.py', 'CursesCommon.py'],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdoutX, stderrX) = p.communicate()
         ret = p.wait()
@@ -87,7 +78,7 @@ class Test_ConfigFile(unittest.TestCase):
         """ Change the abnf program name """
         try:
             os.mkdir("Temp")
-        except OSError as e:
+        except OSError:
             pass
         shutil.copyfile("Tests/empty.cfg", "Temp/empty.cfg")
         check_process(self, [sys.executable, test_program, "--configfile=Temp/empty.cfg",
@@ -98,7 +89,7 @@ class Test_ConfigFile(unittest.TestCase):
         """ Add one dictionary """
         try:
             os.mkdir("Temp")
-        except OSError as e:
+        except OSError:
             pass
         shutil.copyfile("Tests/empty.cfg", "Temp/empty.cfg")
         check_process(self, [sys.executable, test_program, "--configfile=Temp/empty.cfg",
@@ -109,7 +100,7 @@ class Test_ConfigFile(unittest.TestCase):
         """ Change the spell program name """
         try:
             os.mkdir("Temp")
-        except OSError as e:
+        except OSError:
             pass
         shutil.copyfile("Tests/empty.cfg", "Temp/empty.cfg")
         check_process(self, [sys.executable, test_program, "--configfile=Temp/empty.cfg",
@@ -132,7 +123,7 @@ class Test_ConfigFile(unittest.TestCase):
         """ Add one dictionary """
         try:
             os.mkdir("Temp")
-        except OSError as e:
+        except OSError:
             pass
         shutil.copyfile("Tests/empty.cfg", "Temp/empty.cfg")
         check_process(self, [sys.executable, test_program, "--configfile=Temp/empty.cfg",
@@ -144,7 +135,7 @@ class Test_ConfigFile(unittest.TestCase):
         """ Add two dictionaries """
         try:
             os.mkdir("Temp")
-        except OSError as e:
+        except OSError:
             pass
         shutil.copyfile("Tests/empty.cfg", "Temp/empty.cfg")
         check_process(self, [sys.executable, test_program, "--configfile=Temp/empty.cfg",
@@ -431,7 +422,7 @@ class Test_Spell(unittest.TestCase):
         """ Interative spelling test #1 """
         try:
             os.mkdir("Temp")
-        except OSError as e:
+        except OSError:
             pass
         shutil.copyfile("Tests/en.pws", "Temp/en.pws")
         check_process(self, [sys.executable, test_program, "--no-rng", "--no-dup-detection",

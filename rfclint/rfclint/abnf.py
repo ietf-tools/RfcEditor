@@ -1,5 +1,4 @@
 import sys
-import errno
 import io
 import subprocess
 import re

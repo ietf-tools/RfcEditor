@@ -1,12 +1,7 @@
-import io
 import re
 import os
-import errno
 import sys
-import colorama
 import six
-import platform
-import codecs
 try:
     import curses
     haveCurses = True

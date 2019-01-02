@@ -64,7 +64,7 @@ class CursesCommon(object):
                 curses.echo()
                 curses.endwin()
                 self.curses = None
-            except curses.error as e:
+            except curses.error:
                 pass
 
     def writeStringInit(self):
