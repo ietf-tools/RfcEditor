@@ -45,6 +45,20 @@ class Test_Coding(unittest.TestCase):
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
 
+    def test_pyflakes_confrmance(self):
+        p = subprocess.Popen(['pyflakes', 'run.py', 'abnf.py', 'config.py', 'spell.py',
+                                        'test.py', 'dups.py', 'CursesCommon.py'],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        (stdoutX, stderrX) = p.communicate()
+        ret = p.wait()
+        if ret > 0:
+            if six.PY3:
+                stdoutX = stdoutX.decode('utf-8')
+                stderrX = stderrX.decode('utf-8')
+            print(stdoutX)
+            print(stderrX)
+            self.assertEqual(ret, 0)
+
 
 class TestCommandLineOptions(unittest.TestCase):
     """ Run a set of command line checks to make sure they work """

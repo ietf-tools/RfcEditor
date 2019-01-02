@@ -1,11 +1,9 @@
 import lxml.etree
-from rfctools_common.parser import XmlRfc
 from rfctools_common import log
 import math
 import sys
 import difflib
 import six
-import re
 from lxml.html import builder as E
 from xmldiff.EditItem import EditItem
 from xmldiff.EditDistance import ComputeEdits, DoWhiteArray
@@ -346,7 +344,6 @@ class DiffRoot(object):
             return DiffPI(xml, parent)
         if xml.tag is lxml.etree.Comment:
             return DiffComment(xml, parent)
-        textTest = "foo bar" + xml.tag
         return DiffElement(xml, parent)
 
     def getParents(self, includeSelf=False):
@@ -385,7 +382,7 @@ class DiffRoot(object):
                 right = otherParents[count-1]
                 parent = myParents[-1]
                 # should this return True?
-            return false
+            return False
         else:
             iLeft = -1
             iRight = -1
@@ -793,7 +790,6 @@ class DiffDocument(DiffRoot):
                         for child in edit.right.children:
                             if child.matchNode:
                                 child.matchNode.untangle()
-                        parentChildren = edit.right.parent.matchNode.children
                         edit.right.insertTree = True
                         newEdits.append(edit)
                         continue
@@ -950,7 +946,7 @@ class DiffComment(DiffRoot):
             node.append(n)
         elif self.matchNode is None:
             n = E.SPAN()
-            root.attrib['class'] = 'artwork error'
+            n.attrib['class'] = 'artwork error'
             self.fixPreserveSpace(n, myLine)
             node.append(n)
         else:

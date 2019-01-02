@@ -2,16 +2,13 @@
 
 import optparse
 import os
-import lxml.etree
-import datetime
 import six
 import sys
 from rfctools_common.parser import XmlRfcParser, XmlRfcError, CACHES
 from rfctools_common import log
-from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, AddParagraphs, tagMatching
+from xmldiff.DiffNode import DiffRoot, BuildDiffTree, AddParagraphs, tagMatching
 from xmldiff.DiffNode import SourceFiles
 import string
-from xmldiff.EditItem import EditItem
 from xmldiff.zzs2 import distance
 # from xmldiff.zzs import distance, EditItem
 from xmldiff.__init__ import __version__
@@ -157,9 +154,6 @@ def main():
     except XmlRfcError as e:
         log.exception('Unable to parse the XML document: ' + rightSource, e)
         sys.exit(1)
-
-    if options.raw:
-        tagMatching = None
 
     log.note("Read files for source display")
     leftSources = ""

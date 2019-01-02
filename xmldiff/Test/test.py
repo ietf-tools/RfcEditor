@@ -9,10 +9,9 @@ import six
 import inspect
 import struct
 from rfctools_common.parser import XmlRfcParser
-from rfctools_common.parser import XmlRfcError
 from xmldiff.EditItem import EditItem
 from xmldiff.zzs2 import distance
-from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, diffCount
+from xmldiff.DiffNode import DiffRoot, BuildDiffTree
 from xmldiff.DiffNode import ChangeTagMatching, tagMatching, AddParagraphs, SourceFiles
 
 xmldiff_program = "rfc-xmldiff"
@@ -101,8 +100,8 @@ class TestParserMethods(unittest.TestCase):
 
     def test_pyflakes_confrmance(self):
         p = subprocess.Popen(['pyflakes', '../xmldiff/run.py', '../xmldiff/zzs2.py',
-                                        '../xmldiff/EditDistance.py', '../xmldiff/EditItem.py',
-                                        '../xmldiff/DiffNode.py', 'test.py'],
+                              '../xmldiff/EditDistance.py', '../xmldiff/EditItem.py',
+                              '../xmldiff/DiffNode.py', 'test.py'],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdoutX, stderrX) = p.communicate()
         ret = p.wait()
@@ -275,7 +274,6 @@ class TestOverlappedTrees(unittest.TestCase):
 def DistanceTest(tester, leftFile, rightFile, diffFile, htmlFile, markParagraphs):
     """ General distance test function """
     options = OOO()
-    diffCount = 0
     SourceFiles.Clear()
     left = XmlRfcParser(leftFile, quiet=True, cache_path=None, no_network=True). \
         parse(strip_cdata=False, remove_comments=False)

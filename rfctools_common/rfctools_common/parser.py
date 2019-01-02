@@ -4,7 +4,6 @@
 
 """ Public XML parser module """
 
-import io
 import re
 import os
 import codecs
