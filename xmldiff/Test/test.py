@@ -94,9 +94,25 @@ class TestParserMethods(unittest.TestCase):
         """Test that we conform to PEP8."""
         pep8style = pycodestyle.StyleGuide(quiet=False, config_file="pycode.cfg")
         result = pep8style.check_files(['../xmldiff/run.py', '../xmldiff/zzs2.py',
+                                        '../xmldiff/EditDistance.py', '../xmldiff/EditItem.py',
                                         '../xmldiff/DiffNode.py', 'test.py'])
         self.assertEqual(result.total_errors, 0,
                          "Found code style errors (and warnings).")
+
+    def test_pyflakes_confrmance(self):
+        p = subprocess.Popen(['pyflakes.exe', '../xmldiff/run.py', '../xmldiff/zzs2.py',
+                                        '../xmldiff/EditDistance.py', '../xmldiff/EditItem.py',
+                                        '../xmldiff/DiffNode.py', 'test.py'],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        (stdoutX, stderrX) = p.communicate()
+        ret = p.wait()
+        if ret > 0:
+            if six.PY3:
+                stdoutX = stdoutX.decode('utf-8')
+                stderrX = stderrX.decode('utf-8')
+            print(stdoutX)
+            print(stderrX)
+            self.assertEqual(ret, 0)
 
 
 class TestDistanceMethods(unittest.TestCase):
