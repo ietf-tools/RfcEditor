@@ -1,12 +1,32 @@
 import re
 import sys
 import os
+from enum import Enum
 
 Console = sys.stdout
+
+class Trace(Enum):
+    STOP = 1
+    DIAG = 2
+    UP = 3
+    LEFT = 4
+
+
+def matrix(left, right):
+    if left == right:
+        return 1
+    if '\n' in left:
+        if '\n' in right:
+            return 4
+        return -20
+    elif '\n' in right:
+        return -20
+    return -20
 
 def ComputeEdits(leftArray, rightArray):
 
     d = {}
+    trace = {}
     S = len(leftArray)
     T = len(rightArray)
 
@@ -39,68 +59,90 @@ def ComputeEdits(leftArray, rightArray):
     S = len(leftIndex)
     T = len(rightIndex)
 
-    d[0, 0] = 0
+    gap = 10
+
+    v = {}
+    v[0] = 0
+    trace[0, 0] = Trace.STOP
     for i in range(1, S):
-        d[i, 0] = d[i-1, 0] + (4 if '\n' in leftArray[leftIndex[i]] else 1)
+        trace[i, 0] = Trace.UP
 
-    for j in range(1, T):
-        d[0, j] = d[0, j-1] + (4 if '\n' in rightArray[rightIndex[j]] else 1)
+    for i in range(1, T):
+        v[i] = i*-gap
+        trace[0, i] = Trace.LEFT
 
-    for j in range(1, T):
-        for i in range(1, S):
+    vOld = 0
+    for i in range(1, S):
+        v[0] = i * -gap
+        # Console.write(str(i))
+        # Console.write(": ")
+        for j in range(1, T):
             left = leftArray[leftIndex[i]]
             right = rightArray[rightIndex[j]]
-            if left == right:
-                d[i, j] = d[i-1, j-1]
-            elif '\n' in left and '\n' in right:
-                d[i, j] = d[i-1, j-1]
+
+            x = v[j] - gap
+            y = v[j-1] - gap
+            z = vOld + matrix(left, right)
+
+            vOld = v[j]
+            v[j] = max(x, y, z)
+            # Console.write("{0:5d} ".format(v[j]))
+
+            if v[j] == x:
+                trace[i, j] = Trace.UP
+            elif v[j] == y:
+                trace[i, j] = Trace.LEFT
             else:
-                d[i, j] = min(d[i-1, j] + (d[i, 0] - d[i-1, 0]),   # Insert
-                              d[i, j-1] + (d[0, j] - d[0, j-1]),   # Delete
-                              d[i-1, j-1] + d[i,0] - d[i-1, 0] + d[0, j] - d[0, j-1])  # Change = max(Insert + Delete)
+                trace[i, j] = Trace.DIAG
 
+        vOld = i * -gap
+        # Console.write("\n")
 
+    # Console.write("\n")
     # for i in range(S):
     #    Console.write(str(i))
     #    Console.write(": ")
     #    for j in range(T):
-    #        Console.write(str(d[i, j]))
+    #        if trace[i,j] == Trace.LEFT:
+    #            Console.write('L')
+    #        elif trace[i,j] == Trace.UP:
+    #            Console.write('U')
+    #        elif trace[i,j] == Trace.DIAG:
+    #            Console.write('D')
+    #        elif trace[i,j] == Trace.STOP:
+    #            Console.write('S')
+    #        else:
+    #            Console.write('X')
     #        Console.write(" ")
     #    Console.write("\n")
 
     i = S - 1
     j = T - 1
-    val = d[i, j]
-    ops = []
     leftIndex.append(leftIndex[-1]+1)
     rightIndex.append(rightIndex[-1]+1)
+    ops = []
 
     op = opEnd
 
-    while (i >= 0 and j >= 0):
-        if i == 0:
-            if j == 0:
-                op1 = ['equal', leftIndex[i], leftIndex[i+1], rightIndex[j], rightIndex[j+1]]
-                j -= 1
-                i -= 1
-                op1 = ['nop', 0, 0, 0, 0]
-            else:
-                op1 = ['insert', leftIndex[i+1], leftIndex[i+1], rightIndex[j], rightIndex[j+1]]
-                j -= 1
-        elif j == 0:
+    stillGoing = True
+    while stillGoing:
+        if trace[i, j] == Trace.UP:
             op1 = ['remove', leftIndex[i], leftIndex[i+1], rightIndex[j+1], rightIndex[j+1]]
             i -= 1
-        else:
-            if d[i, j] == d[i-1, j-1] and d[i-1, j-1] < d[i-1, j] and d[i-1, j-1] < d[i, j-1]:
+        elif trace[i, j] == Trace.LEFT:
+            op1 = ['insert', leftIndex[i+1], leftIndex[i+1], rightIndex[j], rightIndex[j+1]]
+            j -= 1
+        elif trace[i, j] == Trace.DIAG:
+            if leftArray[leftIndex[i]] == rightArray[rightIndex[j]]:
                 op1 = ['equal', leftIndex[i], leftIndex[i+1], rightIndex[j], rightIndex[j+1]]
-                i -= 1
-                j -= 1
-            elif d[i-1, j] <= d[i, j-1]:
-                op1 = ['remove', leftIndex[i], leftIndex[i+1], rightIndex[j+1], rightIndex[j+1]]
-                i -= 1
             else:
-                op1 = ['insert', leftIndex[i+1], leftIndex[i+1], rightIndex[j], rightIndex[j+1]]
-                j -= 1
+                op1 = ['swap', leftIndex[i],  leftIndex[i+1], rightIndex[j], rightIndex[j+1]]
+            i -= 1
+            j -= 1
+        else:
+            stillGoing = False
+            ops.append(op)
+            break
         
         if op1[0] == op[0]:
             op[1] = op1[1]
