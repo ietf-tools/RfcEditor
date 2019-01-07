@@ -7,7 +7,6 @@ import six
 from rfctools_common.parser import XmlRfcParser, CACHES
 from rfctools_common.parser import XmlRfcError
 
-
 class Test_Coding(unittest.TestCase):
     @unittest.skipIf(True, "it has gone bad - the number of errors is different on different platforms")
     def test_pycodestyle_conformance(self):

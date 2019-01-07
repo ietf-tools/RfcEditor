@@ -5,7 +5,6 @@ import sys
 import colorama
 import six
 import codecs
-import subprocess
 try:
     import curses
     haveCurses = True
@@ -16,9 +15,8 @@ from rfclint.CursesCommon import CursesCommon
 
 
 if six.PY2:
-    import subprocess32
-    subprocess = subprocess32
-    input = raw_input
+    import subprocess32 as subprocess
+    from six.moves import input
 else:
     import subprocess
 
@@ -197,7 +195,7 @@ class Speller(CursesCommon):
         m = re.match(r".*International Ispell Version [\d.]+ \(but really (\w+) ([\d.]+).*",
                      versionOut.decode('utf-8'))
         if m is None:
-            raise RfcLintError("Error starting the spelling program\n{0}".format(line))
+            raise RfcLintError("Error starting the spelling program\n{0}".format(program))
 
         if m.group(1).lower() != spellBaseName:
             raise RfcLintError("Error: The wrong spelling program was started.  Expected"

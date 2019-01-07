@@ -6,7 +6,7 @@ import six
 import sys
 from rfctools_common.parser import XmlRfcParser, XmlRfcError, CACHES
 from rfctools_common import log
-from xmldiff.DiffNode import DiffRoot, BuildDiffTree, AddParagraphs, tagMatching
+from xmldiff.DiffNode import DiffRoot, BuildDiffTree, AddParagraphs
 from xmldiff.DiffNode import SourceFiles
 import string
 from xmldiff.zzs2 import distance

@@ -560,7 +560,7 @@ class XmlRfcParser:
                 if element.tag == "rfc":
                     self.rfc_number = element.attrib.get("number", None)
                     break
-        except lxml.etree.XMLSyntaxError as e:
+        except lxml.etree.XMLSyntaxError:
             pass
             # log.warn("Parsing Error: %s" % e)
         except ValueError as e:

@@ -53,7 +53,7 @@ class CursesCommon(object):
                     if self.curses:
                         self.endwin()
                     self.curses = None
-                    log.error("Problem loading curses - " + tostr(e))
+                    log.error("Problem loading curses - " + e)
             else:
                 log.warn("Unable to load CURSES for python")
 

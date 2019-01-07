@@ -12,7 +12,7 @@ from rfctools_common.parser import XmlRfcParser
 from xmldiff.EditItem import EditItem
 from xmldiff.zzs2 import distance
 from xmldiff.DiffNode import DiffRoot, BuildDiffTree
-from xmldiff.DiffNode import ChangeTagMatching, tagMatching, AddParagraphs, SourceFiles
+from xmldiff.DiffNode import ChangeTagMatching, AddParagraphs, SourceFiles
 
 xmldiff_program = "rfc-xmldiff"
 
@@ -228,7 +228,7 @@ class TestDistanceMethods(unittest.TestCase):
 
     def test_Table1(self):
         """ Add a layer to a tree """
-        global tagMatching
+        from xmldiff.DiffNode import tagMatching
 
         hold = tagMatching
         ChangeTagMatching(None)

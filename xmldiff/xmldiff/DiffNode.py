@@ -51,10 +51,7 @@ nsKeys = {
 nsKeysIndex = 0
 
 diffCount = 0
-if six.PY2:
-    nbsp = unichr(0xa0)
-else:
-    nbsp = chr(0xa0)
+nbsp = six.unichr(0xa0)
 
 
 def ChangeTagMatching(newMatching):
@@ -672,9 +669,9 @@ class DiffDocument(DiffRoot):
                 if edit.right.matchNode is not None:
                     continue
 
-                if isinstance(edit.right, DiffElement) and \
-                   (edit.right.xml.tag == 'back' or edit.right.xml.tag == 'middle'):
-                    thisIsABreak = 9
+                # if isinstance(edit.right, DiffElement) and \
+                #    (edit.right.xml.tag == 'back' or edit.right.xml.tag == 'middle'):
+                #     thisIsABreak = 9
 
                 if edit.right.insertTree:
                     matchingParent = edit.right.parent.matchNode
@@ -1262,7 +1259,7 @@ class DiffParagraph(DiffRoot):
             clone.children.append(child.cloneTree(clone))
         return clone
 
-    def decorateSource(self):
+    def decorateSource(self, sourceLines):
         for child in self.children:
             child.decorateSource(sourceLines)
 
