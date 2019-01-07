@@ -111,7 +111,7 @@ class SourceExtracter(object):
         lineOffsets = []
         for item in codeItems:
             if six.PY2:
-                file.write(six.u(item.text))
+                file.write(unicode(item.text))
             else:
                 file.write(item.text)
             lineCount = item.text.count('\n') + 1
