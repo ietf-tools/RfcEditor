@@ -53,49 +53,120 @@ def ComputeEdits(leftArray, rightArray):
             opEnd[3] = T-i + 1
             break
 
-    leftIndex = [ i for i in range(rangeStart-1, len(leftArray)-rangeEnd) ]
-    rightIndex = [ i for i in range(rangeStart-1, len(rightArray)-rangeEnd) ]
+    leftIndex = [ i for i in range(rangeStart, len(leftArray)-rangeEnd) if leftArray[i] != ' ' ]
+    rightIndex = [ i for i in range(rangeStart, len(rightArray)-rangeEnd) if rightArray[i] != ' ' ]
+    leftIndex.insert(0, 0)
+    rightIndex.insert(0, 0)
 
     S = len(leftIndex)
     T = len(rightIndex)
 
     gap = 10
+    o = gap # gap
+    e = 3 # extend
+    maxNegValue = - 655456
 
     v = {}
-    v[0] = 0
+    vDiagonal = 0   # best score in cell
+    f = maxNegValue # score from diagonal
+    h = maxNegValue # best score ending with gap from left
+    g = {}          # best score ending with gap from above
+    g[0] = f
+    for i in range(1, T):
+        v[i] = 0    # -o - (j-1)*e
+        g[i] = maxNegValue
+    
+    lengthOfHorizongalGap = 0
+    lengthOfVerticalGap = {}
+
+    maximumScore = maxNegValue
+    
+        
     trace[0, 0] = Trace.STOP
     for i in range(1, S):
         trace[i, 0] = Trace.UP
 
     for i in range(1, T):
-        v[i] = i*-gap
         trace[0, i] = Trace.LEFT
 
-    vOld = 0
-    for i in range(1, S):
-        v[0] = i * -gap
-        # Console.write(str(i))
-        # Console.write(": ")
-        for j in range(1, T):
-            left = leftArray[leftIndex[i]]
+
+    #  Fil lin the matrices
+    for i in range(1, S):   # for all rows
+        v[0] = -o - (i - 1) * e
+
+        Console.write(str(i))
+        Console.write(": \n")
+        left = leftArray[leftIndex[i]]
+
+        for j in range(1, T):  # for all columns
             right = rightArray[rightIndex[j]]
 
-            x = v[j] - gap
-            y = v[j-1] - gap
-            z = vOld + matrix(left, right)
+            simularityScore = matrix(left, right)
 
-            vOld = v[j]
-            v[j] = max(x, y, z)
-            # Console.write("{0:5d} ".format(v[j]))
+            f = vDiagonal + simularityScore
 
-            if v[j] == x:
-                trace[i, j] = Trace.UP
-            elif v[j] == y:
-                trace[i, j] = Trace.LEFT
+            # which cell from the left?
+            if h - e >= v[j-1] - o:
+                h = -e
+                lengthOfHorizontalGap += 1
             else:
-                trace[i, j] = Trace.DIAG
+                h = v[j-1] - o
+                lengthOfHorizontalGap = 1
 
-        vOld = i * -gap
+            # which cell from above?
+            if g[j] - e >= v[j] - o:
+                g[j] = g[j] - e
+                lengthOfVerticalGap[j] = lengthOfVerticalGap[j] + 1
+            else:
+                g[j] = v[j] - o
+                lengthOfVerticalGap[j] = 1
+
+            vDiagonal = v[j]
+            v[j] = max(f, g[j], h)  # get best score
+            if v[j] > maximumScore:
+                maximumScore = v[j]
+                maxi = i
+                maxj = j
+
+            if v[j] == f:
+                trace[i, j] = Trace.DIAG
+            elif v[j] == g[j]:
+                trace[i, j] = Trace.UP
+                # lengths[l] = lengthOfVerticalGap[j]
+            else:
+                trace[i, j] = Trace.UP
+                # lengths[l] = lengthOfHorizontalGap
+
+        for j in range(1, T):
+            Console.write("{0:3d} ".format(v[j]))
+        Console.write("\n")
+            
+        for j in range(1, T):
+            Console.write("{0:3d} ".format(g[j]))
+        Console.write("\n")
+            
+        for j in range(1, T):
+            Console.write("{0:3d} ".format(lengthOfVerticalGap[j]))
+        Console.write("\n")
+
+        for j in range(1, T):
+            if trace[i,j] == Trace.LEFT:
+                ch = 'L'
+            elif trace[i,j] == Trace.UP:
+                ch = 'U'
+            elif trace[i,j] == Trace.DIAG:
+                ch = 'D'
+            elif trace[i,j] == Trace.STOP:
+                ch = 'S'
+            else:
+                ch = ' '
+            Console.write("  {0} ".format(ch))
+        Console.write("\n")
+
+        # Reset
+        h = maxNegValue
+        vDiagonal = 0
+        lengthOfHorizontalGap = 0
         # Console.write("\n")
 
     # Console.write("\n")
