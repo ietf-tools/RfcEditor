@@ -99,7 +99,7 @@ def main():
 
     # Parse the document into an xmlrfc tree instance
     parser = XmlRfcParser(source, verbose=options.verbose,
-                          preserve_all_white=False,
+                          preserve_all_white=True,
                           quiet=options.quiet,
                           cache_path=options.cache,
                           no_network=options.no_network,
