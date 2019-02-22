@@ -162,8 +162,9 @@ def test_rfc_file(tester, fileName):
     """ Run the basic tests for a single input file """
 
     basename = os.path.basename(fileName)
-    parse = XmlRfcParser("Tests/" + fileName, quiet=True, cache_path=None, no_network=True)
-    tree = parse.parse()
+    parse = XmlRfcParser("Tests/" + fileName, quiet=True, cache_path=None, no_network=True,
+                         preserve_all_white=True)
+    tree = parse.parse(remove_comments=False, remove_pis=True, strip_cdata=False)
 
     log.write_out = io.StringIO()
     log.write_err = log.write_out
@@ -184,8 +185,9 @@ def test_svg_file(tester, fileName):
     """ Run the basic tests for a single input file """
 
     basename = os.path.basename(fileName)
-    parse = XmlRfcParser("Tests/" + fileName, quiet=True, cache_path=None, no_network=True)
-    tree = parse.parse()
+    parse = XmlRfcParser("Tests/" + fileName, quiet=True, cache_path=None, no_network=True,
+                         preserve_all_white=True)
+    tree = parse.parse(remove_comments=False, remove_pis=True, strip_cdata=False)
 
     log.write_out = io.StringIO()
     log.write_err = log.write_out
