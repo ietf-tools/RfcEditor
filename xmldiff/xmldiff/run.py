@@ -165,6 +165,8 @@ def main():
         tagMatching = None
 
     log.note("Read files for source display")
+    cache = CachingResolver(library_dirs=[])
+    
     leftSources = ""
     leftSourceNames = ""
     for i in range(len(SourceFiles.leftFiles)):
@@ -174,6 +176,9 @@ def main():
             file = file[2]
             if file[2] == ':':
                 file = file[1:]
+        else:
+            file = cache.getReferenceRequest(file)[0]
+
         if six.PY2:
             with open(file, "rb") as f:
                 leftLines = f.read()
@@ -193,8 +198,6 @@ def main():
     rightSources = ""
     rightSourceNames = ""
 
-    cache = CachingResolver(library_dirs=[])
-    
     for i in range(len(SourceFiles.rightFiles)):
         file = SourceFiles.rightFiles[i]
         if file[:5] == 'file:':
