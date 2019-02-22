@@ -166,7 +166,7 @@ def main():
 
     log.note("Read files for source display")
     cache = CachingResolver(library_dirs=[])
-    
+
     leftSources = ""
     leftSourceNames = ""
     for i in range(len(SourceFiles.leftFiles)):
@@ -207,8 +207,7 @@ def main():
                 file = file[1:]
         else:
             file = cache.getReferenceRequest(file)[0]
-        
-        
+
         if six.PY2:
             with open(file, "rb") as f:
                 rightLines = f.read().decode('utf8').splitlines(1)
