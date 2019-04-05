@@ -451,9 +451,9 @@ class CachingResolver(lxml.etree.Resolver):
                 try:
                     xml = lxml.etree.fromstring(text)
                     if self.validate_ref(xml):
-                        xml.set('{%s}base'%xml2rfc.utils.namespaces['xml'], r.url)
+                        xml.set('{%s}base'%utils.namespaces['xml'], r.url)
                         text = lxml.etree.tostring(xml, encoding='utf8')
-                except Exception as e:
+                except Exception:
                     pass
                 write_path = os.path.normpath(os.path.join(self.write_cache,
                                                            CACHE_PREFIX, basename))
