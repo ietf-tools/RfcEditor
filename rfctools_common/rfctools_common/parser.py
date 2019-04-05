@@ -31,6 +31,13 @@ CACHES       = ['/var/cache/xml2rfc', '~/.cache/xml2rfc']  # Ordered by priority
 CACHE_PREFIX = ''
 NET_SUBDIRS  = ['bibxml', 'bibxml2', 'bibxml3', 'bibxml4', 'bibxml5']
 
+def SetCache(newCache):
+    global CACHES
+    CACHES = newCache
+
+def GetCache():
+    return CACHES
+
 class XmlRfcError(Exception):
     """ Application XML errors with positional information
 

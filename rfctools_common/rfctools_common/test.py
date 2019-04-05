@@ -4,7 +4,7 @@ import os
 import shutil
 import subprocess
 import six
-from rfctools_common.parser import XmlRfcParser, CACHES
+from rfctools_common.parser import XmlRfcParser, SetCache, GetCache
 from rfctools_common.parser import XmlRfcError
 
 class Test_Coding(unittest.TestCase):
@@ -90,12 +90,14 @@ class TestParserMethods(unittest.TestCase):
 
     def test_remote_cache_entity(self):
         """ Test that a remote https entity can be cached """
-        CACHES = []
+        old = GetCache()
+        SetCache([])
         parser = XmlRfcParser("Tests/entity-http.xml", quiet=False,
                               cache_path='Tests/cache', no_network=False)
         clear_cache(parser)
         tree = parser.parse()
         parser.cachingResolver.close_all()
+        SetCache(old)
         self.assertEqual(len(tree.tree.xpath('reference')), 1,
                          "Must be exactly one reference node")
         self.assertTrue(os.path.exists('Tests/cache/reference.RFC.1847.xml'))
@@ -113,7 +115,8 @@ class TestParserMethods(unittest.TestCase):
 
     def test_local_cache_entity(self):
         """ Test that an entity in the cache can be used w/o a network """
-        CACHES = []
+        old = GetCache()
+        SetCache([])
         parser = XmlRfcParser("Tests/entity-http.xml", quiet=False,
                               cache_path='Tests/cache', no_network=True)
         clear_cache(parser)
@@ -125,15 +128,18 @@ class TestParserMethods(unittest.TestCase):
         self.assertEqual(len(tree.tree.xpath('reference')), 1,
                          "Must be exactly one reference node")
         parser.cachingResolver.close_all()
+        SetCache(old)
 
     def test_local_nocache_entity(self):
         """ See that we have a failure if we try to get an uncached item """
-        CACHES = []
+        restore = GetCache()
+        SetCache([])
         parser = XmlRfcParser("Tests/entity-http.xml", quiet=False,
                               cache_path='Tests/cache', no_network=True)
         clear_cache(parser)
         with self.assertRaises(XmlRfcError):
             parser.parse()
+        SetCache(restore)
 
     def test_french_xml(self):
         """ Parse file w/ encoding ISO-8859-1 """
@@ -160,11 +166,14 @@ class TestRegressions(unittest.TestCase):
 
     def test_network_dtd(self):
         """ Find a dtd using the network """
-        CACHES = []
+        old = GetCache()
+        # CACHES = []
+        SetCache([])
         parser = XmlRfcParser("Tests/network-dtd.xml", quiet=False,
                               cache_path='Tests/cache')
         clear_cache(parser)
         parser.parse()
+        SetCache(old)
         parser.cachingResolver.close_all()
 
 

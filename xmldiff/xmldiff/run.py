@@ -70,7 +70,7 @@ def main():
     value_options = optparse.OptionGroup(optionparser, 'Other Options')
     value_options.add_option('-o', '--out', dest='output_filename', metavar='FILE',
                              help='specify an explicit output filename',
-                             default="xmldiff.html")
+                             default=None)
     value_options.add_option('--debug', action="store_true",
                              help='Show debugging output')
     value_options.add_option('--raw', action="store_true",
@@ -273,10 +273,13 @@ def main():
         }
     output = html_template.substitute(subs)
 
-    log.note('Write out html file: ' + options.output_filename)
-    file = open(options.output_filename, "wb")
-    file.write(output.encode('utf8'))
-    file.close()
+    if options.output_filename is None:
+        sys.stdout.write(output)
+    else:
+        log.note('Write out html file: ' + options.output_filename)
+        file = open(options.output_filename, "wb")
+        file.write(output.encode('utf8'))
+        file.close()
 
 
 if __name__ == '__main__':
