@@ -196,7 +196,7 @@ def check(el, depth=0):
             if vals and vals[0] == '[' and False:
                 # ok, new_val = check_some_props(attr, val, depth)
                 # if not ok:
-                    # el.attrib[attr] = new_val[1:]
+                #    el.attrib[attr] = new_val[1:]
                 pass
             else:
                 ok, new_val = value_ok(attr, val)

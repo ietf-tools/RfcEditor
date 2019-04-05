@@ -7,6 +7,9 @@ import six
 from rfctools_common import log
 from rfclint.spell import which, RfcLintError
 
+if six.PY3:
+    unicode = str
+
 
 class AbnfChecker(object):
     def __init__(self, config):
