@@ -38,8 +38,9 @@ NET_SUBDIRS  = ['bibxml', 'bibxml2', 'bibxml3', 'bibxml4', 'bibxml5']
 Default_options = Values(defaults={
     'verbose':False,
     'no_network':False,
-    'vocabulary':'v2',
-    'cache':None
+    'vocabulary':'v3',
+    'cache':None,
+    'quiet':False
 })
 
 
