@@ -25,6 +25,9 @@ def matrix(left, right):
         return (1, -200)
     return (1, -100)
 
+Console = sys.stdout
+
+
 def ComputeEdits(leftArray, rightArray):
 
     d = {}
@@ -193,6 +196,9 @@ def ComputeEdits(leftArray, rightArray):
 
     i = S - 1
     j = T - 1
+
+    # val = d[i, j]
+    ops = []
     leftIndex.append(leftIndex[-1]+1)
     rightIndex.append(rightIndex[-1]+1)
     ops = []
@@ -218,14 +224,14 @@ def ComputeEdits(leftArray, rightArray):
             stillGoing = False
             ops.append(op)
             break
-        
+
         if op1[0] == op[0]:
             op[1] = op1[1]
             op[3] = op1[3]
         else:
             ops.append(op)
             op = op1
-    
+
     # ops.append(op)
     ops.append(opStart)
     ops = list(ops)
@@ -233,7 +239,8 @@ def ComputeEdits(leftArray, rightArray):
 
     # Console.write("Pre compression\n")
     # for op in ops:
-    #     Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" % (op[0], op[1], op[2], op[3], op[4], ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
+    #     Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" % (op[0], op[1], op[2], op[3], op[4],
+    #           ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
     ops = CompressEdits(ops, leftArray, rightArray)
 
     return ops
@@ -259,6 +266,7 @@ def DoWhiteArray(text):
             result.append(right)
     return result
 
+
 def CompressEdits(ops, leftArray, rightArray):
     opsNew = []
     left = None
@@ -266,48 +274,49 @@ def CompressEdits(ops, leftArray, rightArray):
 
     for i in range(len(ops)):
         if ops[i][0] == 'remove':
-            if leftArray[ops[i][1]][0] == '\n' and right != None:
+            if leftArray[ops[i][1]][0] == '\n' and right is not None:
                 opsNew.append(right)
                 right = None
-            if left != None:
+            if left is not None:
                 left[2] = ops[i][2]
             else:
                 left = ops[i]
         elif ops[i][0] == 'insert':
-            if rightArray[ops[i][3]][0] == '\n' and left != None:
+            if rightArray[ops[i][3]][0] == '\n' and left is not None:
                 opsNew.append(left)
                 left = None
-            if right != None:
+            if right is not None:
                 right[4] = ops[i][4]
             else:
                 right = ops[i]
         else:
-            if ops[i][2] - ops[i][1] == 1 and (leftArray[ops[i][1]] == u' ' or leftArray[ops[i][1]] == u'\xa0') and \
-                i+1 < len(ops) and ops[i+1][0] != 'equal' and not (left == None and right == None):
-                if left != None:
+            if ops[i][2] - ops[i][1] == 1 and \
+               (leftArray[ops[i][1]] == u' ' or leftArray[ops[i][1]] == u'\xa0') and \
+               i+1 < len(ops) and ops[i+1][0] != 'equal' and not (left is None and right is None):
+                if left is not None:
                     left[2] = ops[i][2]
                 else:
                     left = ['remove', ops[i][1], ops[i][2], ops[i][3], ops[i][4]]
-                if right != None:
+                if right is not None:
                     right[4] = ops[i][4]
                 else:
                     right = ['insert', ops[i][1], ops[i][2], ops[i][3], ops[i][4]]
             else:
-                if left != None:
+                if left is not None:
                     opsNew.append(left)
                     left = None
-                if right != None:
+                if right is not None:
                     opsNew.append(right)
                     right = None
                 opsNew.append(ops[i])
 
-
-    if left != None:
+    if left is not None:
         opsNew.append(left)
-    if right != None:
+    if right is not None:
         opsNew.append(right)
 
     return opsNew
+
 
 if __name__ == '__main__':
     old = " attr1=\"value2\""
@@ -319,10 +328,12 @@ if __name__ == '__main__':
     ops = ComputeEdits(leftArray, rightArray)
 
     for op in ops:
-        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" % (op[0], op[1], op[2], op[3], op[4], ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
+        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" %
+                      (op[0], op[1], op[2], op[3], op[4],
+                       ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
 
     Console.write("**********************************************\n")
-    
+
     old = "This is\xa0a\xa0message\nwith one change"
     new = "This is\xa0a message with\ntwo change"
     leftArray = DoWhiteArray(old)
@@ -331,7 +342,9 @@ if __name__ == '__main__':
     ops = ComputeEdits(leftArray, rightArray)
 
     for op in ops:
-        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" % (op[0], op[1], op[2], op[3], op[4], ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
+        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" %
+                      (op[0], op[1], op[2], op[3], op[4],
+                       ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
 
     Console.write("**********************************************\n")
 
@@ -353,32 +366,62 @@ if __name__ == '__main__':
     old = "This document specifies algorithm identifiers and ASN.1 encoding formats for Elliptic Curve constructs using the curve25519 and curve448 curves. <!--\xa0Remove\xa0ph\n\xa0The\xa0signature\xa0algorithms\xa0covered\xa0are\xa0Ed25519,\xa0Ed25519ph,\xa0Ed448\xa0and\xa0Ed448ph.\n-->\nThe signature algorithms covered are Ed25519 and Ed448. The key agreement algorithm covered are X25519 and X448. The encoding for Public Key, Private Key and EdDSA digital signature structures is provided."
     
     new = "This document specifies algorithm identifiers and ASN.1 encoding formats for elliptic curve constructs using the curve25519 and curve448 curves.  The signature algorithms covered are Ed25519 and Ed448.  The key agreement algorithms covered are X25519 and X448.  The encoding for public key, private key, and Edwards-curve Digital Signature Algorithm (EdDSA) structures is provided."
+
     leftArray = DoWhiteArray(old)
     rightArray = DoWhiteArray(new)
 
     ops = ComputeEdits(leftArray, rightArray)
 
     for op in ops:
-        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" % (op[0], op[1], op[2], op[3], op[4], ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
+        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" %
+                      (op[0], op[1], op[2], op[3], op[4],
+                       ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
 
     Console.write("**********************************************\n")
-    old = "The encoding for Public Key, Private Key and EdDSA digital signature structures is provided."
-    new = "The encoding for public key, private key, and Edwards-curve Digital Signature Algorithm (EdDSA) structures is provided."
+    old = "The encoding for Public Key, Private Key and EdDSA digital signature structures " + \
+          "is provided."
+    new = "The encoding for public key, private key, and Edwards-curve Digital Signature " + \
+          "Algorithm (EdDSA) structures is provided."
     leftArray = DoWhiteArray(old)
     rightArray = DoWhiteArray(new)
 
     ops = ComputeEdits(leftArray, rightArray)
 
     for op in ops:
-        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" % (op[0], op[1], op[2], op[3], op[4], ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
+        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" %
+                      (op[0], op[1], op[2], op[3], op[4],
+                       ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
 
     Console.write("**********************************************\n")
 
-    old = "In <xref target=\"RFC8032\"/> the elliptic curve signature system Edwards-curve Digital Signature Algorithm (EdDSA) is described along with a recommendation for the use of the curve25519 and curve448. EdDSA has defined two modes, the PureEdDSA mode without pre-hashing, and the HashEdDSA mode with pre-hashing.\n<!--\xa0Remove\xa0pre-hash\nThe\xa0Ed25519ph\xa0and\xa0Ed448ph\xa0algorithm\xa0definitions\xa0specify\xa0the\xa0one-way\xa0hash\xa0function\xa0that\xa0is\xa0used\xa0for\xa0pre-hashing.\nThe\xa0convention\xa0used\xa0for\xa0identifying\xa0the\xa0algorithm/curve\xa0combinations\xa0are\xa0to\xa0use\xa0the\xa0Ed25519\xa0and\xa0Ed448\xa0for\xa0the\xa0PureEdDSA\xa0mode,\xa0with\xa0Ed25519ph\xa0and\xa0Ed448ph\xa0for\xa0the\xa0HashEdDSA\xa0mode.\n-->\nThe convention used for identifying the algorithm/curve combinations is to use \"Ed25519\" and \"Ed448\" for the PureEdDSA mode. The document does not provide the conventions needed for the pre-hash versions of the signature algorithm. The use of the OIDs is described for public keys, private keys and signatures."
-    new = "In <xref target=\"RFC8032\"/> the elliptic curve signature system Edwards-curve Digital Signature Algorithm (EdDSA) is described along with a recommendation for the use of the curve25519 and curve448.  EdDSA has defined two modes: the PureEdDSA mode without prehashing and the HashEdDSA mode with prehashing.  The convention used for identifying the algorithm/curve combinations is to use \"Ed25519\" and \"Ed448\" for the PureEdDSA mode.  This document does not provide the conventions needed for the prehash versions of the signature algorithm.  The use of the OIDs is described for public keys, private keys and signatures."
+    old = "In <xref target=\"RFC8032\"/> the elliptic curve signature system Edwards-curve " + \
+          "Digital Signature Algorithm (EdDSA) is described along with a recommendation for " + \
+          "the use of the curve25519 and curve448. EdDSA has defined two modes, the PureEdDSA " + \
+          "mode without pre-hashing, and the HashEdDSA mode with pre-hashing.\n<!--\xa0Remove" + \
+          "\xa0pre-hash\nThe\xa0Ed25519ph\xa0and\xa0Ed448ph\xa0algorithm\xa0definitions\xa0s" + \
+          "pecify\xa0the\xa0one-way\xa0hash\xa0function\xa0that\xa0is\xa0used\xa0for\xa0pre-" + \
+          "hashing.\nThe\xa0convention\xa0used\xa0for\xa0identifying\xa0the\xa0algorithm/curve" + \
+          "\xa0combinations\xa0are\xa0to\xa0use\xa0the\xa0Ed25519\xa0and\xa0Ed448\xa0for\xa0the" + \
+          "\xa0PureEdDSA\xa0mode,\xa0with\xa0Ed25519ph\xa0and\xa0Ed448ph\xa0for\xa0the\xa0" + \
+          "HashEdDSA\xa0mode.\n-->\nThe convention used for identifying the algorithm/curve " + \
+          "combinations is to use \"Ed25519\" and \"Ed448\" for the PureEdDSA mode. The " + \
+          "document " + \
+          "does not provide the conventions needed for the pre-hash versions of the signature " + \
+          "algorithm. The use of the OIDs is described for public keys, private keys and " + \
+          "signatures."
+    new = "In <xref target=\"RFC8032\"/> the elliptic curve signature system Edwards-curve " + \
+          "Digital Signature Algorithm (EdDSA) is described along with a recommendation for " + \
+          "the use of the curve25519 and curve448.  EdDSA has defined two modes: the PureEdDSA " + \
+          "mode without prehashing and the HashEdDSA mode with prehashing.  The convention " + \
+          "used for identifying the algorithm/curve combinations is to use \"Ed25519\" and " + \
+          "\"Ed448\" for the PureEdDSA mode.  This document does not provide the conventions " + \
+          "needed for the prehash versions of the signature algorithm.  The use of the OIDs is " + \
+          "described for public keys, private keys and signatures."
 
     leftArray = DoWhiteArray(old)
     rightArray = DoWhiteArray(new)
     ops = ComputeEdits(leftArray, rightArray)
     for op in ops:
-        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" % (op[0], op[1], op[2], op[3], op[4], ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
+        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" %
+                      (op[0], op[1], op[2], op[3], op[4],
+                       ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
