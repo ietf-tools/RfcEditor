@@ -1,9 +1,9 @@
 import re
 import sys
-import os
 from enum import Enum
 
 Console = sys.stdout
+
 
 class Trace(Enum):
     STOP = 1
@@ -25,12 +25,9 @@ def matrix(left, right):
         return (1, -200)
     return (1, -100)
 
-Console = sys.stdout
-
 
 def ComputeEdits(leftArray, rightArray):
 
-    d = {}
     trace = {}
     S = len(leftArray)
     T = len(rightArray)
@@ -58,10 +55,12 @@ def ComputeEdits(leftArray, rightArray):
             opEnd[3] = T-i + 1
             break
 
-    leftIndex = [ i for i in range(rangeStart, len(leftArray)-rangeEnd) ]
-    rightIndex = [ i for i in range(rangeStart, len(rightArray)-rangeEnd) ]
-    # leftIndex = [ i for i in range(rangeStart, len(leftArray)-rangeEnd) if leftArray[i] != ' ' ]
-    # rightIndex = [ i for i in range(rangeStart, len(rightArray)-rangeEnd) if rightArray[i] != ' ' ]
+    leftIndex = [i for i in range(rangeStart, len(leftArray)-rangeEnd)]
+    rightIndex = [i for i in range(rangeStart, len(rightArray)-rangeEnd)]
+    # leftIndex = [ i for i in range(rangeStart, len(leftArray)-rangeEnd)
+    #               if leftArray[i] != ' ' ]
+    # rightIndex = [ i for i in range(rangeStart, len(rightArray)-rangeEnd)
+    #                if rightArray[i] != ' ' ]
     leftIndex.insert(0, 0)
     rightIndex.insert(0, 0)
 
@@ -69,26 +68,25 @@ def ComputeEdits(leftArray, rightArray):
     T = len(rightIndex)
 
     gap = 10
-    o = gap # gap
-    e = 3 # extend
+    o = gap   # gap
+    e = 3     # extend
     maxNegValue = - 655465
 
     v = {}
-    vDiagonal = 0   # best score in cell
-    f = maxNegValue # score from diagonal
-    h = maxNegValue # best score ending with gap from left
-    g = {}          # best score ending with gap from above
+    vDiagonal = 0    # best score in cell
+    f = maxNegValue  # score from diagonal
+    h = maxNegValue  # best score ending with gap from left
+    g = {}           # best score ending with gap from above
     g[0] = f
     for i in range(1, T):
         v[i] = -o - (i-1)*e
         g[i] = maxNegValue
-    
+
     lengthOfHorizontalGap = 0
     lengthOfVerticalGap = {}
 
     maximumScore = maxNegValue
-    
-        
+
     trace[0, 0] = Trace.STOP
     for i in range(1, S):
         trace[i, 0] = Trace.UP
@@ -96,8 +94,7 @@ def ComputeEdits(leftArray, rightArray):
     for i in range(1, T):
         trace[0, i] = Trace.LEFT
 
-
-    #  Fil lin the matrices
+    #  Fill in the matrices
     for i in range(1, S):   # for all rows
         v[0] = -o - (i - 1) * e
 
@@ -132,8 +129,6 @@ def ComputeEdits(leftArray, rightArray):
             v[j] = max(f, g[j], h)  # get best score
             if v[j] > maximumScore:
                 maximumScore = v[j]
-                maxi = i
-                maxj = j
 
             if v[j] == f:
                 trace[i, j] = Trace.DIAG
@@ -147,11 +142,11 @@ def ComputeEdits(leftArray, rightArray):
         # for j in range(1, T):
         #     Console.write("{0:3d} ".format(v[j]))
         # Console.write("\n")
-            
+
         # or j in range(1, T):
         #    Console.write("{0:3d} ".format(g[j]))
         # Console.write("\n")
-            
+
         # for j in range(1, T):
         #    Console.write("{0:3d} ".format(lengthOfVerticalGap[j]))
         # Console.write("\n")
@@ -348,9 +343,6 @@ if __name__ == '__main__':
 
     Console.write("**********************************************\n")
 
-    old = "This document specifies algorithm identifiers and ASN.1 encoding formats for Elliptic Curve constructs using the curve25519 and curve448 curves. <!--\xa0Remove\xa0ph\n\xa0The\xa0signature\xa0algorithms\xa0covered\xa0are\xa0Ed25519,\xa0Ed25519ph,\xa0Ed448\xa0and\xa0Ed448ph.\n-->\nThe signature algorithms covered are Ed25519 and Ed448. The key agreement algorithm covered are X25519 and X448. The encoding for Public Key, Private Key and EdDSA digital signature structures is provided."
-    
-    new = "This document specifies algorithm identifiers and ASN.1 encoding formats for elliptic curve constructs using the curve25519 and curve448 curves.  The signature algorithms covered are Ed25519 and Ed448.  The key agreement algorithms covered are X25519 and X448.  The encoding for public key, private key, and Edwards-curve Digital Signature Algorithm (EdDSA) structures is provided."
     old = "This document specifies Elliptic Curve constructs using the curve25519"
     new = "This document specifies elliptic curve constructs using the curve25519"
     leftArray = DoWhiteArray(old)
@@ -359,13 +351,25 @@ if __name__ == '__main__':
     ops = ComputeEdits(leftArray, rightArray)
 
     for op in ops:
-        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" % (op[0], op[1], op[2], op[3], op[4], ''.join(leftArray[op[1]:op[2]]), ''.join(rightArray[op[3]:op[4]])))
+        Console.write("%s %2d %2d %2d %2d '%s' '%s'\n" %
+                      (op[0], op[1], op[2], op[3], op[4], ''.join(leftArray[op[1]:op[2]]),
+                       ''.join(rightArray[op[3]:op[4]])))
 
     Console.write("**********************************************\n")
 
-    old = "This document specifies algorithm identifiers and ASN.1 encoding formats for Elliptic Curve constructs using the curve25519 and curve448 curves. <!--\xa0Remove\xa0ph\n\xa0The\xa0signature\xa0algorithms\xa0covered\xa0are\xa0Ed25519,\xa0Ed25519ph,\xa0Ed448\xa0and\xa0Ed448ph.\n-->\nThe signature algorithms covered are Ed25519 and Ed448. The key agreement algorithm covered are X25519 and X448. The encoding for Public Key, Private Key and EdDSA digital signature structures is provided."
-    
-    new = "This document specifies algorithm identifiers and ASN.1 encoding formats for elliptic curve constructs using the curve25519 and curve448 curves.  The signature algorithms covered are Ed25519 and Ed448.  The key agreement algorithms covered are X25519 and X448.  The encoding for public key, private key, and Edwards-curve Digital Signature Algorithm (EdDSA) structures is provided."
+    old = "This document specifies algorithm identifiers and ASN.1 encoding formats for " + \
+          "Elliptic Curve constructs using the curve25519 and curve448 curves. <!--\xa0" + \
+          "Remove\xa0ph\n\xa0The\xa0signature\xa0algorithms\xa0covered\xa0are\xa0Ed25519," + \
+          "\xa0Ed25519ph,\xa0Ed448\xa0and\xa0Ed448ph.\n-->\nThe signature algorithms covered" + \
+          " are Ed25519 and Ed448. The key agreement algorithm covered are X25519 and X448." + \
+          " The encoding for Public Key, Private Key and EdDSA digital signature structures " + \
+          "is provided."
+
+    new = "This document specifies algorithm identifiers and ASN.1 encoding formats for " + \
+          "elliptic curve constructs using the curve25519 and curve448 curves.  The signature " + \
+          "algorithms covered are Ed25519 and Ed448.  The key agreement algorithms covered are " + \
+          "X25519 and X448.  The encoding for public key, private key, and Edwards-curve" + \
+          " Digital Signature Algorithm (EdDSA) structures is provided."
 
     leftArray = DoWhiteArray(old)
     rightArray = DoWhiteArray(new)

@@ -11,8 +11,8 @@ import struct
 from rfctools_common.parser import XmlRfcParser
 from xmldiff.EditItem import EditItem
 from xmldiff.zzs2 import distance
-from xmldiff.DiffNode import DiffRoot, BuildDiffTree, DecorateSourceFile, diffCount
-from xmldiff.DiffNode import ChangeTagMatching, tagMatching, AddParagraphs, SourceFiles
+from xmldiff.DiffNode import DiffRoot, BuildDiffTree
+from xmldiff.DiffNode import ChangeTagMatching, AddParagraphs, SourceFiles
 from xmldiff.EditDistance import DoWhiteArray, ComputeEdits
 
 xmldiff_program = "rfc-xmldiff"
