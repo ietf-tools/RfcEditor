@@ -352,9 +352,9 @@ def StringAlignTest(tester, leftFile, rightFile, diffFile, htmlFile):
     """ General string comparison function for text alignments """
     if six.PY2:
         with open(leftFile, "rb") as f:
-            leftLines = f.read().decode('utf8')
+            leftLines = f.read().decode('utf8').replace("\r\n", "\n")
         with open(rightFile, "rb") as f:
-            rightLines = f.read().decode('utf8')
+            rightLines = f.read().decode('utf8').replace("\r\n", "\n")
         with open(diffFile, "rb") as f:
             opsLines = f.read().decode('utf8').splitlines()
     else:
@@ -370,7 +370,7 @@ def StringAlignTest(tester, leftFile, rightFile, diffFile, htmlFile):
 
     ops = ComputeEdits(leftArray, rightArray)
 
-    opLines = ["{0} {1:2d} {2:2d} {3:2d} {4:2d} '{5}' '{6}'".
+    opLines = [u"{0} {1:2d} {2:2d} {3:2d} {4:2d} '{5}' '{6}'".
                format(op[0], op[1], op[2], op[3], op[4],
                       ''.join(leftArray[op[1]:op[2]]).replace('\n', "\\n"),
                       ''.join(rightArray[op[3]:op[4]]).replace('\n', '\\n'))
@@ -387,7 +387,7 @@ def StringAlignTest(tester, leftFile, rightFile, diffFile, htmlFile):
 
     if hasError:
         # print(generatedFile)
-        print("\n".join(result))
+        print(u"\n".join(result))
 
     tester.assertFalse(hasError, "Comparisons failed")
 

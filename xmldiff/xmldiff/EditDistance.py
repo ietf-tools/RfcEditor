@@ -1,6 +1,11 @@
 import re
 import sys
-from enum import Enum
+import six
+
+if six.PY2:
+    from aenum import Enum
+else:
+    from enum import Enum
 
 Console = sys.stdout
 
@@ -139,31 +144,7 @@ def ComputeEdits(leftArray, rightArray):
                 trace[i, j] = Trace.LEFT
                 # lengths[l] = lengthOfHorizontalGap
 
-        # for j in range(1, T):
-        #     Console.write("{0:3d} ".format(v[j]))
-        # Console.write("\n")
-
-        # or j in range(1, T):
-        #    Console.write("{0:3d} ".format(g[j]))
-        # Console.write("\n")
-
-        # for j in range(1, T):
-        #    Console.write("{0:3d} ".format(lengthOfVerticalGap[j]))
-        # Console.write("\n")
-
-        # for j in range(1, T):
-        #     if trace[i,j] == Trace.LEFT:
-        #         ch = 'L'
-        #     elif trace[i,j] == Trace.UP:
-        #         ch = 'U'
-        #     elif trace[i,j] == Trace.DIAG:
-        #         ch = 'D'
-        #     elif trace[i,j] == Trace.STOP:
-        #         ch = 'S'
-        #     else:
-        #         ch = ' '
-        #     Console.write("  {0} ".format(ch))
-        # Console.write("\n")
+        # PrintLine(i, T, v, g, lengthOfVerticalGap, trace)
 
         # Reset
         h = maxNegValue
@@ -241,11 +222,42 @@ def ComputeEdits(leftArray, rightArray):
     return ops
 
 
+def PrintLine(i, T, v, g, lengthOfVerticalGap, trace):
+    Console.write("i={0:3d}".format(i))
+    for j in range(1, T):
+        Console.write("{0:3d} ".format(v[j]))
+    Console.write("\n")
+
+    for j in range(1, T):
+        Console.write("{0:3d} ".format(g[j]))
+    Console.write("\n")
+
+    for j in range(1, T):
+        Console.write("{0:3d} ".format(lengthOfVerticalGap[j]))
+    Console.write("\n")
+
+    for j in range(1, T):
+        if trace[i, j] == Trace.LEFT:
+            ch = 'L'
+        elif trace[i, j] == Trace.UP:
+            ch = 'U'
+        elif trace[i, j] == Trace.DIAG:
+            ch = 'D'
+        elif trace[i, j] == Trace.STOP:
+            ch = 'S'
+        else:
+            ch = ' '
+        Console.write("  {0} ".format(ch))
+    Console.write("\n")
+
+    Console.write("\n")
+
+
 def DoWhiteArray(text):
     result = []
     #  At some point I want to split whitespace with
     #  CR in them to multiple lines
-    for right in re.split(r'([\s\xa0=]+)', text):
+    for right in re.split(r'([\s\xa0=]+)', text, flags=re.UNICODE):
         if len(right) == 0:
             continue
         if right.isspace():
