@@ -114,7 +114,7 @@ setup(
     #  'dev':['twine',],
     # ]
 
-    extra_require= {
+    extras_require= {
         ':python_version == "2.7"': [
             'aenum',
         ],
