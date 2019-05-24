@@ -25,10 +25,10 @@ def matrix(left, right):
     if '\n' in left:
         if '\n' in right:
             return (1, 4)
-        return (1, -200)
+        return (1, -50)
     elif '\n' in right:
-        return (1, -200)
-    return (1, -100)
+        return (1, -50)
+    return (1, -25)
 
 
 def ComputeEdits(leftArray, rightArray):
@@ -180,6 +180,7 @@ def ComputeEdits(leftArray, rightArray):
     ops = []
 
     op = opEnd
+    op2 = None
 
     stillGoing = True
     while stillGoing:
@@ -193,13 +194,29 @@ def ComputeEdits(leftArray, rightArray):
             if leftArray[leftIndex[i]] == rightArray[rightIndex[j]]:
                 op1 = ['equal', leftIndex[i], leftIndex[i+1], rightIndex[j], rightIndex[j+1]]
             else:
-                op1 = ['swap', leftIndex[i],  leftIndex[i+1], rightIndex[j], rightIndex[j+1]]
+                op1 = ['remove', leftIndex[i],  leftIndex[i+1], rightIndex[j+1], rightIndex[j+1]]
+                op2 = ['insert', leftIndex[i+1], leftIndex[i+1], rightIndex[j], rightIndex[j+1]]
             i -= 1
             j -= 1
         else:
             stillGoing = False
             ops.append(op)
             break
+
+        if op2:
+            if op2[0] == op[0]:
+                op[1] = op2[1]
+                op[3] = op2[3]
+                op2 = None
+            elif op1[0] == op[0]:
+                op[1] = op1[1]
+                op[3] = op1[3]
+                op1 = op2
+                op2 = None
+            else:
+                ops.append(op)
+                ops.append(op2)
+                op2 = None
 
         if op1[0] == op[0]:
             op[1] = op1[1]
