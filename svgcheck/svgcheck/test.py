@@ -162,13 +162,15 @@ class TestParserMethods(unittest.TestCase):
                       "Results/utf8.out", "Results/utf8.err", None, None)
 
     def test_twice(self):
+        if not os.path.exists('Temp'):
+            os.mkdir('Temp')
         check_process(self, [sys.executable, test_program, "-r", "--out=Temp/utf8-1.svg",
                              "Tests/utf8.svg"],
                       "Results/empty", "Results/utf8.err", None, None)
         check_process(self, [sys.executable, test_program, "-r", "--out=Temp/utf8-2.svg",
                              "Temp/utf8-1.svg"],
                       "Results/empty", "Results/utf8-2.err",
-                      "Results/utf8-2.svg", "Temp/utf8-2.svg")
+                      None, "Temp/utf8-2.svg")
 
 
 class TestViewBox(unittest.TestCase):
