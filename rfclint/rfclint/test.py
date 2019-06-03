@@ -215,7 +215,7 @@ class Test_Extract(unittest.TestCase):
         check_process(self, [sys.executable, test_program, "--extract=yang",
                              "--out=Temp/yang.yang", "--no-spell", "--no-dup-detection",
                              "--no-rng", "Tests/yang.xml"],
-                      "Results/yang.yang", "Results/empty",
+                      "Results/empty", "Results/empty",
                       "Results/yang1.yang", "Temp/yang.yang")
         self.assertTrue(compare_file2("./yang-a.yang", "Results/yang-a.yang", True))
         if os.path.exists("./yang-a.yang"):
