@@ -212,7 +212,6 @@ def ComputeEdits(leftArray, rightArray):
                 op[3] = op1[3]
                 op1 = op2
             else:
-                ops.append(op)
                 ops.append(op2)
             op2 = None
 
