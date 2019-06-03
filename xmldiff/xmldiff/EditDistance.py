@@ -20,7 +20,7 @@ class Trace(Enum):
 def matrix(left, right):
     if left == right:
         if left[0] == ' ':
-            return (0, 1)
+            return (0, 2)
         return (0, 1)
     if '\n' in left:
         if '\n' in right:
