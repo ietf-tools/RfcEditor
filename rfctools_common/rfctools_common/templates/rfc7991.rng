@@ -1781,11 +1781,11 @@
         <zeroOrMore>
           <text/>
         </zeroOrMore>
-        <ref name="svg"/>
+        <externalRef href="SVG-1.2-RFC.rng"/>
       </choice>
     </element>
   </define>
-  <include href="SVG-1.2-RFC.rng"/>
+  <!-- include href="SVG-1.2-RFC.rng"/ -->
   <define name="sourcecode">
     <element name="sourcecode">
       <optional>
