@@ -69,7 +69,6 @@ class Test_Coding(unittest.TestCase):
         copyright_year_re = r"(?i)Copyright The IETF Trust 201\d-%s, All Rights Reserved" % (2019)
 
         passed = True
-        print(files)
 
         for name in files:
             with open(name) as file:
@@ -85,7 +84,6 @@ class Test_Coding(unittest.TestCase):
                     continue
 
         files = [f for f in os.listdir(dirParent) if f[-3:] == '.py']
-        print(files)
 
         for name in files:
             with open(os.path.join("..", name)) as file:
