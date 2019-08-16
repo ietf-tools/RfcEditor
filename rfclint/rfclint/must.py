@@ -85,8 +85,8 @@ class Lang2119(CursesCommon):
             if not tree.text:
                 inner = lxml.etree.tostring(tree, with_tail=False)
                 if not isinstance(inner, type('')):
-                    innser = inner.decode('utf8')
-                log.error("text '{0}' in bcp14 tag is not bcp14 language".format(innser),
+                    inner = inner.decode('utf8')
+                log.error("text '{0}' in bcp14 tag is not bcp14 language".format(inner),
                           where=tree)
             elif not self.bcp14_re.match(tree.text):
                 log.error("text '{0}' in bcp14 tag is not bcp14 language".
