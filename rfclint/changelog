@@ -6,6 +6,7 @@ rfclint (0.5.17) distribution(s); urgency=low
 	* Keep the case of the first word to display for dup detection
 	* Add first level support for BCP 14 checking - Only reports does not fix
 	* Add more programming checks for style
+	* Remove Python 3.4 from supported list
 
 -- Jim Schaad <ietf@augustcellars.com>  Fri 16 Aug 2019 12:00:00 -0700
 
