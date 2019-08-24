@@ -119,22 +119,23 @@ def main():
 
     # Check that
 
-    if not checkTree(xmlrfc.tree):
-        if options.repair:
-            encodedBytes = lxml.etree.tostring(xmlrfc.tree.getroot(),
-                                               xml_declaration=True,
-                                               encoding='utf-8',
-                                               pretty_print=True).decode('utf-8')
-            if options.output_filename is None:
-                file = sys.stdout
-            else:
-                file = open(options.output_filename, 'w')
+    ok = checkTree(xmlrfc.tree):
+    if options.repair:
+        encodedBytes = lxml.etree.tostring(xmlrfc.tree.getroot(),
+                                           xml_declaration=True,
+                                           encoding='utf-8',
+                                           pretty_print=True).decode('utf-8')
+        if options.output_filename is None:
+            file = sys.stdout
+        else:
+            file = open(options.output_filename, 'w')
             log.write_to(file, encodedBytes)
-        log.error("File does not conform to SVG requirements")
-        sys.exit(1)
-
-    log.info("File conforms to SVG requirements.")
-    sys.exit(0)
+    if ok:
+        log.info("File conforms to SVG requirements.")
+        sys.exit(0)
+        
+    log.error("File does not conform to SVG requirements")
+    sys.exit(1)
 
 
 if __name__ == '__main__':

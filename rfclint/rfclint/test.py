@@ -680,6 +680,13 @@ class Test_BCP14(unittest.TestCase):
                              "Tests/bcp14.xml"],
                       "Results/empty", "Results/bcp14.err", None, None)
 
+    def test_check2(self):
+        check_process(self, [sys.executable, test_program, "--no-rng", "--no-spell",
+                             "--no-abnf", "--no-xml", "--no-dup-detection", "--bcp14",
+                             "--out=Temp/bcp14.xml", "Tests/bcp14.xml"],
+                      "Results/empty", "Results/bcp14-2.err",
+                      "Temp/bcp14.xml", "Results/bcp14-2.xml")
+
 
 def compare_file2(errFile, stderr, displayError):
     with open(stderr, 'rb') as f:
