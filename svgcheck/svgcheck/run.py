@@ -54,6 +54,8 @@ def main():
     svg_options = optparse.OptionGroup(optionparser, 'SVG options')
     svg_options.add_option('-r', '--repair', action='store_true', default=False,
                            help='Repair the SVG so it meets RFC 7966')
+    svg_options.add_option('-a', '--always-emit', action='store_true', default=False,
+                           help='Emit the SVG file even if does not need repairing.  Implies -r')
     optionparser.add_option_group(svg_options)
 
     # --- Parse and validate arguments --------------
@@ -119,8 +121,8 @@ def main():
 
     # Check that
 
-    ok = checkTree(xmlrfc.tree):
-    if options.repair:
+    ok = checkTree(xmlrfc.tree)
+    if (not ok and options.repair) or options.always_emit:
         encodedBytes = lxml.etree.tostring(xmlrfc.tree.getroot(),
                                            xml_declaration=True,
                                            encoding='utf-8',
@@ -129,11 +131,12 @@ def main():
             file = sys.stdout
         else:
             file = open(options.output_filename, 'w')
-            log.write_to(file, encodedBytes)
+        log.write_to(file, encodedBytes)
+
     if ok:
         log.info("File conforms to SVG requirements.")
         sys.exit(0)
-        
+
     log.error("File does not conform to SVG requirements")
     sys.exit(1)
 

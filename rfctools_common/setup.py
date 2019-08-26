@@ -83,7 +83,7 @@ setup(
     long_description=long_description,
 
     # The projects main homepage.
-    url='https://github.com/ietf-tools/RfcEditor/tree/master/rfctools_common",
+    url='https://github.com/ietf-tools/RfcEditor/tree/master/rfctools_common',
 
     # Author details
     author='Jim Schaad',
