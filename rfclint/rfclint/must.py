@@ -52,8 +52,9 @@ class Lang2119(CursesCommon):
     def __init__(self, config):
         CursesCommon.__init__(self, config)
 
-        self.bcp14_re = re.compile(r"MUST NOT|MUST|REQUIRED|SHALL NOT|SHALL|SHOULD NOT|SHOULD|"
-                                   r"NOT RECOMMENDED|RECOMMENDED|MAY|OPTIONAL")
+        self.bcp14_re = re.compile(u"MUST[ |\u00A0]NOT|MUST|REQUIRED|SHALL[ |\u00A0]NOT|SHALL|"
+                                   u"SHOULD[ |\u00A0]NOT|SHOULD|"
+                                   u"NOT[ |\u00A0]RECOMMENDED|RECOMMENDED|MAY|OPTIONAL", re.UNICODE)
 
         self.rewrite = False
         if config.options.output_filename is not None:
@@ -75,10 +76,10 @@ class Lang2119(CursesCommon):
                 inner = lxml.etree.tostring(tree, with_tail=False)
                 if not isinstance(inner, type('')):
                     inner = inner.decode('utf8')
-                log.error("text '{0}' in bcp14 tag is not bcp14 language".format(inner),
+                log.error(u"text '{0}' in bcp14 tag is not bcp14 language".format(inner),
                           where=tree)
             elif not self.bcp14_re.match(tree.text):
-                log.error("text '{0}' in bcp14 tag is not bcp14 language".
+                log.error(u"text '{0}' in bcp14 tag is not bcp14 language".
                           format(tree.text), where=tree)
         elif tree.text:
             xx = self.bcp14_re.search(tree.text)
@@ -93,7 +94,7 @@ class Lang2119(CursesCommon):
                 else:
                     xx = self.bcp14_re.finditer(tree.text)
                     for x in xx:
-                        log.error("bcp14 text '{0}' found without bcp14 tag around it".
+                        log.error(u"bcp14 text '{0}' found without bcp14 tag around it".
                                   format(x.group(0)), where=tree)
         if tree.tail:
             xx = self.bcp14_re.search(tree.tail)
@@ -109,7 +110,7 @@ class Lang2119(CursesCommon):
                 else:
                     xx = self.bcp14_re.finditer(tree.text)
                     for x in xx:
-                        log.error("bcp14 text '{0}' found without bcp14 tag around it".
+                        log.error(u"bcp14 text '{0}' found without bcp14 tag around it".
                                   format(x.group(0)), where=tree)
 
         for node in tree.iterchildren():
