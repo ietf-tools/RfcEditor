@@ -1,4 +1,4 @@
-xmldiff (0.5.20) distribution(s); urgency=low
+xmldiff (0.6.1) distribution(s); urgency=low
 
 	* Fix two text differance bugs
 
