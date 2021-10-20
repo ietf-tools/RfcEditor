@@ -56,11 +56,11 @@ def main():
 
     svg_options = optparse.OptionGroup(optionparser, 'SVG options')
     svg_options.add_option('-r', '--repair', action='store_true', default=False,
-                           help='Repair the SVG so it meets RFC 7966')
+                           help='Repair the SVG so it meets RFC 7996')
     svg_options.add_option('-a', '--always-emit', action='store_true', default=False,
                            help='Emit the SVG file even if does not need repairing.  Implies -r')
     svg_options.add_option('-g', '--grey-scale', action='store_true',
-                           help='Use grey scaling hieristic to determine what is white')
+                           help='Use grey scaling heuristic to determine what is white')
     svg_options.add_option('--grey-level', default=381,
                            help='Level to use for grey scaling, defaults to 381')
     optionparser.add_option_group(svg_options)
