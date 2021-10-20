@@ -139,7 +139,8 @@ def main():
         log.write_to(file, encodedBytes)
 
     if ok:
-        log.info("File conforms to SVG requirements.")
+        if not options.quiet:
+            log.info("File conforms to SVG requirements.")
         sys.exit(0)
 
     log.error("File does not conform to SVG requirements")
