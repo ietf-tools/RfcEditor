@@ -1,6 +1,10 @@
 # RFC Editor Tools
 
-This project contains a set of tools that are being developed for the RFC editor tools.
-This directory contains the current developement branch and as such are not ready to be distributed.
-The project exists mostly so that continuous testing can be run on different platforms.
+Each tool has been moved to an individual GitHub repository:
 
+- [rfclint](https://github.com/ietf-tools/rfclint)
+- [rfctools-common](https://github.com/ietf-tools/rfctools-common)
+- [svgcheck](https://github.com/ietf-tools/svgcheck)
+- [rfc-xmldiff](https://github.com/ietf-tools/rfc-xmldiff)
+
+This repository is read-only and for archival purpose only.
