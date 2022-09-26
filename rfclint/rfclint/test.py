@@ -273,6 +273,14 @@ class Test_Extract(unittest.TestCase):
                       "Results/empty", "Results/empty",
                       "Results/extract.txt", "Temp/extract.txt")
 
+    def test_extract_null_name(self):
+        """ Try and extract an item which does not exist """
+        check_process(self, [sys.executable, test_program, "--extract=abnf",
+                             "--out=Temp/extract.txt", "--no-spell", "--no-dup-detection",
+                             "--no-rng", "Tests/abnf-no-name.xml"],
+                      "Results/empty", "Results/empty",
+                      "Results/extract.txt", "Temp/extract.txt")
+
     def test_extract_to_name(self):
         """ extract multiple named items """
         if os.path.exists("./yang-a.yang"):
@@ -290,6 +298,19 @@ class Test_Extract(unittest.TestCase):
         self.assertTrue(compare_file2("./yang-b.yang", "Results/yang-b.yang", True))
         if os.path.exists("./yang-b.yang"):
             os.remove("./yang-b.yang")
+
+    def test_extract_multiple_to_name(self):
+        """ extract multiple named items """
+        if os.path.exists("./yang-a.yang"):
+            os.remove("./yang-a.yang")
+        check_process(self, [sys.executable, test_program, "--extract=yang",
+                             "--out=Temp/yang.yang", "--no-spell", "--no-dup-detection",
+                             "--no-rng", "Tests/yang2.xml"],
+                      "Results/empty", "Results/empty",
+                      "Results/yang1.yang", "Temp/yang.yang")
+        self.assertTrue(compare_file2("./yang-a.yang", "Results/yang2-a.yang", True))
+        if os.path.exists("./yang-a.yang"):
+            os.remove("./yang-a.yang")
 
 
 class Test_Xml(unittest.TestCase):

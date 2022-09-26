@@ -275,7 +275,8 @@ class Speller(CursesCommon):
 
         log.note("spell command = '{0}'".format(" ".join(cmdLine)))
         self.p = subprocess.Popen(cmdLine,
-                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT)
         if six.PY2:
             if os.name == 'nt':
                 self.stdin = codecs.getwriter('iso-8859-1')(self.p.stdin)
@@ -525,8 +526,8 @@ class Speller(CursesCommon):
                     self.Interact(words[1], w, -1, wordSet, words, sp[0])
                 else:
                     if attributeName:
-                        log.error("Misspelled word '{0}' in attribute '{1}'".format(w.group(0),
-                                                                                    attributeName),
+                        log.error(u"Misspelled word '{0}' in attribute '{1}'".format(w.group(0),
+                                                                                     attributeName),
                                   where=words[1])
                     else:
                         log.error(u"Misspelled word was found '{0}'".format(w.group(0)),
@@ -631,7 +632,8 @@ class Speller(CursesCommon):
         for i in range(min(10, len(suggest))):
             str1 = u"{0}) {1}".format((i+1) % 10, suggest[i].strip())
             if self.curses:
-                self.curses.addstr(int(i/2) + curses.LINES-12, int(i % 2)*40, str1)
+                self.curses.addstr(int(i/2) + curses.LINES-12, int(i % 2)*40,
+                                   str1.encode('ascii', 'replaceWithONE'))
 
             else:
                 log.write_on_line(str1 + " ")

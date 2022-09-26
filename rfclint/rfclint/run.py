@@ -69,7 +69,7 @@ def main():
     parser_options.add_option('-n', '--no-rng', action='store_true',
                               help='disable RNG validation step')
     parser_options.add_option('-r', '--rng', action='store_true',
-                              help='Specify an alternate RNG file')
+                              help='Validate using the RNG file (default)')
     parser_options.add_option('-X', '--no-xinclude', action='store_true', dest='no_xinclude',
                               help='don\'t resolve any xi:include elements')
 
@@ -247,9 +247,16 @@ def main():
             file = sys.stdout
 
         needEOL = True
+        filesUsed = []
         for item in codeItems:
-            if "name" in item.attrib:
-                with open(item.attrib["name"], 'w') as f:
+            if "name" in item.attrib and len(item.attrib["name"]) > 0:
+                if item.attrib["name"] in filesUsed:
+                    writeType = 'a'
+                else:
+                    writeType = 'w'
+                    filesUsed.append(item.attrib["name"])
+
+                with open(item.attrib["name"], writeType) as f:
                     f.write(item.text)
                     if len(item.text) > 0 and item.text[-1] != '\n':
                         f.write('\n')
