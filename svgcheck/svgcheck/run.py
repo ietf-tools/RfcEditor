@@ -105,11 +105,6 @@ def main():
         if not os.path.exists(source):
             sys.exit('No such file: ' + source)
 
-    # Setup warnings module
-    # rfclint.log.warn_error = options.warn_error and True or False
-    log.quiet = options.quiet and True or False
-    log.verbose = options.verbose
-
     # Parse the document into an xmlrfc tree instance
     parser = XmlRfcParser(source, verbose=options.verbose,
                           preserve_all_white=True,
@@ -144,7 +139,8 @@ def main():
         log.write_to(file, encodedBytes)
 
     if ok:
-        log.info("File conforms to SVG requirements.")
+        if not options.quiet:
+            log.info("File conforms to SVG requirements.")
         sys.exit(0)
 
     log.error("File does not conform to SVG requirements")
